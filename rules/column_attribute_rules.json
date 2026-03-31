@@ -1,19 +1,43 @@
 [
   {
-    "column_name": "rgst_user_id",
-    "attribute_name": "등록자ID",
-    "attr_type": "RELATION",
-    "rel_val": "사용자정보.사용자ID"
+    "column_name": "agre_yn",
+    "attribute_name": "동의여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
   },
   {
-    "column_name": "mdfy_user_id",
-    "attribute_name": "수정자ID",
-    "attr_type": "RELATION",
-    "rel_val": "사용자정보.사용자ID"
+    "column_name": "andr_yn",
+    "attribute_name": "안드로이드여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
   },
   {
-    "column_name": "use_yn",
-    "attribute_name": "사용여부",
+    "column_name": "captcha_auth_yn",
+    "attribute_name": "CAPTCHA 인증여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "clip_mmbr_yn",
+    "attribute_name": "클립멤버여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "cncl_yn",
+    "attribute_name": "취소여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "cndt_stsr_goods_yn",
+    "attribute_name": "조건충족상품여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "cpn_cncl_ind",
+    "attribute_name": "쿠폰취소경로구분",
     "attr_type": "",
     "rel_val": "['Y', 'N']"
   },
@@ -24,40 +48,76 @@
     "rel_val": "['Y', 'N']"
   },
   {
+    "column_name": "end_yn",
+    "attribute_name": "종료여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "err_cd",
+    "attribute_name": "오류코드",
+    "attr_type": "RELATION",
+    "rel_val": "메시지정보.메시지코드"
+  },
+  {
+    "column_name": "exp_yn",
+    "attribute_name": "엑스포트권한여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "init_yn",
+    "attribute_name": "디폴트조회여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "ios_yn",
+    "attribute_name": "IOS여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "ldap_auth_yn",
+    "attribute_name": "LDAP 인증여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "limit_yn",
+    "attribute_name": "한도여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "log_write_yn",
+    "attribute_name": "로그기록여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "logcntr_if_yn",
+    "attribute_name": "로그센터 연동여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
     "column_name": "login_yn",
     "attribute_name": "로그인여부",
     "attr_type": "",
     "rel_val": "['Y', 'N']"
   },
   {
-    "column_name": "otp_auth_yn",
-    "attribute_name": "OTP인증여부",
+    "column_name": "mand_yn",
+    "attribute_name": "필수여부",
     "attr_type": "",
     "rel_val": "['Y', 'N']"
   },
   {
-    "column_name": "captcha_auth_yn",
-    "attribute_name": "CAPTCHA인증여부",
-    "attr_type": "",
-    "rel_val": "['Y', 'N']"
-  },
-  {
-    "column_name": "ldap_auth_yn",
-    "attribute_name": "LDAP인증여부",
-    "attr_type": "",
-    "rel_val": "['Y', 'N']"
-  },
-  {
-    "column_name": "rgst_yn",
-    "attribute_name": "등록권한",
-    "attr_type": "",
-    "rel_val": "['Y', 'N']"
-  },
-  {
-    "column_name": "read_yn",
-    "attribute_name": "보기권한",
-    "attr_type": "",
-    "rel_val": "['Y', 'N']"
+    "column_name": "mdfy_user_id",
+    "attribute_name": "수정자ID",
+    "attr_type": "RELATION",
+    "rel_val": "사용자정보.사용자ID"
   },
   {
     "column_name": "mdfy_yn",
@@ -66,8 +126,20 @@
     "rel_val": "['Y', 'N']"
   },
   {
-    "column_name": "exp_yn",
-    "attribute_name": "엑스포트권한여부",
+    "column_name": "otp_auth_yn",
+    "attribute_name": "OTP 인증여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "own_yn",
+    "attribute_name": "개통자여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "pay_noti_yn",
+    "attribute_name": "알림여부",
     "attr_type": "",
     "rel_val": "['Y', 'N']"
   },
@@ -78,18 +150,57 @@
     "rel_val": "포인트제공처.포인트코드"
   },
   {
-    "column_name": "log_write_yn",
-    "attribute_name": "로그기록여부",
+    "column_name": "ratr_show_yn",
+    "attribute_name": "전환율표시여부",
     "attr_type": "",
     "rel_val": "['Y', 'N']"
   },
   {
-    "column_name": "logcntr_if_yn",
-    "attribute_name": "로그센터연동여부",
+    "column_name": "read_yn",
+    "attribute_name": "보기권한",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "rgst_user_id",
+    "attribute_name": "등록자ID",
+    "attr_type": "RELATION",
+    "rel_val": "사용자정보.사용자ID"
+  },
+  {
+    "column_name": "rgst_yn",
+    "attribute_name": "등록권한",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "success_yn",
+    "attribute_name": "성공여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "sucs_yn",
+    "attribute_name": "성공여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "use_yn",
+    "attribute_name": "사용여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "user_id",
+    "attribute_name": "사용자ID",
+    "attr_type": "RELATION",
+    "rel_val": "사용자정보.사용자ID"
+  },
+  {
+    "column_name": "window_yn",
+    "attribute_name": "윈도우지원",
     "attr_type": "",
     "rel_val": "['Y', 'N']"
   }
-
-
-
 ]
