@@ -283,9 +283,10 @@ Row 3: [A3]Entity 정의 | [B3:L3]                                              
 - PK 행: bold 처리
 - Keys 열: PK → `PK`, Unique Key → `UK`
 - FK Relation & Value: `{참조테이블}.{참조컬럼}` 형식, Attribute Type = `RELATION`
-- 코드그룹 규칙 (`rules/dtl_code.csv`): COLUMN NAME이 코드그룹명과 일치하면
+- 코드그룹 규칙 (`rules/dtl_code.csv`): 아래 두 조건 중 하나라도 일치하면 동일하게 적용
+  - **B열 매칭**: `col.name == CSV 1열(코드그룹명)` → K열 `IND_CD="{col.name}"`
+  - **C열 매칭**: `col.attribute_name == CSV 2열(설명)` → K열 `IND_CD="{해당 행의 1열 코드그룹명}"`
   - J열 Attribute Type = `코드 그룹`
-  - K열 Relation & Value = `IND_CD="{컬럼명}"`
   - L열 Source = 해당 코드그룹의 코드값 목록, `["APLY", "TRMN"]` 형식
   - CSV 포맷: `코드그룹,설명,그룹접두사,코드값,코드명칭` (5열)
 - column_attribute_rules.json 규칙: `(column_name, attribute_name)` 쌍 매칭 → J, K열 고정값 출력

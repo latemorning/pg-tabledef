@@ -18,6 +18,7 @@
 """
 from __future__ import annotations
 
+import csv
 import json
 import os
 from pathlib import Path
@@ -29,20 +30,47 @@ from openpyxl.styles import Font, Alignment, PatternFill
 from ..models import TableDef
 from . import styles as S
 
-_RULES_PATH = Path(__file__).parent.parent.parent / "rules" / "column_attribute_rules.json"
+_RULES_DIR = Path(__file__).parent.parent.parent / "rules"
+
 
 def _load_column_rules() -> dict[tuple[str, str], tuple[str, str]]:
     """rules/column_attribute_rules.json 로드 → {(column_name, attribute_name): (attr_type, rel_val)}"""
-    if not _RULES_PATH.exists():
+    path = _RULES_DIR / "column_attribute_rules.json"
+    if not path.exists():
         return {}
-    with _RULES_PATH.open(encoding="utf-8") as f:
+    with path.open(encoding="utf-8") as f:
         rules = json.load(f)
     return {
         (r["column_name"], r["attribute_name"]): (r["attr_type"], r["rel_val"])
         for r in rules
     }
 
+
+def _load_dtl_code_rules() -> tuple[dict[str, list[str]], dict[str, tuple[str, list[str]]]]:
+    """rules/dtl_code.csv 로드.
+
+    Returns:
+        by_name: {code_group: [code_value, ...]}          # B열(col.name) 매칭용
+        by_attr: {description: (code_group, [code_value, ...])}  # C열(col.attribute_name) 매칭용
+    """
+    path = _RULES_DIR / "dtl_code.csv"
+    if not path.exists():
+        return {}, {}
+    by_name: dict[str, list[str]] = {}
+    by_attr: dict[str, tuple[str, list[str]]] = {}
+    with path.open(encoding="utf-8") as f:
+        for row in csv.reader(f):
+            if len(row) >= 4:
+                group, desc, code_val = row[0], row[1], row[3]
+                by_name.setdefault(group, []).append(code_val)
+                if desc not in by_attr:
+                    by_attr[desc] = (group, [])
+                by_attr[desc][1].append(code_val)
+    return by_name, by_attr
+
+
 _COLUMN_RULES = _load_column_rules()
+_DTL_BY_NAME, _DTL_BY_ATTR = _load_dtl_code_rules()
 
 if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet
@@ -278,6 +306,7 @@ class ExcelWriter:
             keys_str  = "PK" if col.is_pk else ("UK" if col.is_uk else "")
             attr_type = ""
             rel_val   = ""
+            src_val   = ""
             if col.fk_info:
                 attr_type = "RELATION"
                 ref_cols  = ", ".join(col.fk_info.ref_columns) if col.fk_info.ref_columns else ""
@@ -285,6 +314,18 @@ class ExcelWriter:
             rule = _COLUMN_RULES.get((col.name, col.attribute_name))
             if rule:
                 attr_type, rel_val = rule
+            # dtl_code.csv: B열(col.name) 매칭
+            if col.name in _DTL_BY_NAME:
+                code_vals = _DTL_BY_NAME[col.name]
+                attr_type = "코드 그룹"
+                rel_val   = f'IND_CD="{col.name}"'
+                src_val   = str(code_vals)
+            # dtl_code.csv: C열(col.attribute_name) 매칭
+            elif col.attribute_name and col.attribute_name in _DTL_BY_ATTR:
+                code_group, code_vals = _DTL_BY_ATTR[col.attribute_name]
+                attr_type = "코드 그룹"
+                rel_val   = f'IND_CD="{code_group}"'
+                src_val   = str(code_vals)
 
             row_data = [
                 (1,  col.no,              S.ALIGN_CENTER),
@@ -298,7 +339,7 @@ class ExcelWriter:
                 (9,  "",                  S.ALIGN_LEFT_NO_WRAP),  # Description (미사용)
                 (10, attr_type,           S.ALIGN_CENTER),
                 (11, rel_val,             S.ALIGN_LEFT_NO_WRAP),
-                (12, "",                  S.ALIGN_LEFT_NO_WRAP),  # Source (미지원)
+                (12, src_val,             S.ALIGN_LEFT_NO_WRAP),  # Source (코드그룹 값 목록)
             ]
             for c_idx, val, align in row_data:
                 self._wc(ws, r, c_idx, val, font=font, align=align)

@@ -178,25 +178,21 @@ COL_WIDTHS = {
 
 1. FK (`col.fk_info` 존재) → J=`RELATION`, K=`ref_table.ref_col`, L=`""`
 2. `column_attribute_rules.json` 매칭 (`(col.name, col.attribute_name)`) → J/K 고정값, L=`""`
-3. `dtl_code.csv` 코드그룹 매칭 (`col.name == code_group`) → J=`코드 그룹`, K=`IND_CD="{col.name}"`, L=`["APLY", "TRMN"]` 형식
+3. `dtl_code.csv` 코드그룹 매칭 (B열 우선, C열 fallback):
+   - **B열 매칭**: `col.name in _DTL_BY_NAME` → K=`IND_CD="{col.name}"`
+   - **C열 매칭**: `col.attribute_name in _DTL_BY_ATTR` → K=`IND_CD="{code_group}"`
+   - J=`코드 그룹`, L=`["APLY", "TRMN"]` 형식
 
 **`rules/dtl_code.csv` 로드 (`_load_dtl_code_rules`):**
 ```python
 # CSV 포맷: 코드그룹, 설명, 그룹접두사, 코드값, 코드명칭
-# 반환: {code_group: [code_value, ...]}
-# 예: {"AUTO_PAY_STAT_CD": ["APLY", "TRMN"], ...}
+# 반환:
+#   by_name: {code_group: [code_value, ...]}                    # B열 매칭용
+#   by_attr: {description: (code_group, [code_value, ...])}     # C열 매칭용
 
-def _load_dtl_code_rules() -> dict[str, list[str]]:
-    path = _RULES_DIR / "dtl_code.csv"
-    if not path.exists():
-        return {}
-    result: dict[str, list[str]] = {}
-    with path.open(encoding="utf-8") as f:
-        for row in csv.reader(f):
-            if len(row) >= 4:
-                group, code_val = row[0], row[3]
-                result.setdefault(group, []).append(code_val)
-    return result
+def _load_dtl_code_rules():
+    ...
+    return by_name, by_attr
 ```
 
 L열 출력값: `str(code_values)` → Python 리스트 표현식 그대로, 예: `["APLY", "TRMN"]`
