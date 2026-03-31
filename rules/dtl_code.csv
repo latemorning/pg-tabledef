@@ -1,0 +1,253 @@
+AUTO_PAY_STAT_CD,자동납부 상태,PG,APLY,신청
+AUTO_PAY_STAT_CD,자동납부 상태,PG,TRMN,해지
+BTCH_JOB_CD,배치JOB코드,AD,ClipToPHubJob,클립포인트 일대사 배치
+BTCH_JOB_CD,배치JOB코드,AD,PHubToPGJob,세틀뱅크 일대사 배치
+BTCH_JOB_CD,배치JOB코드,AD,PHubStatJob,포인트허브 일통계생성 배치
+BTCH_JOB_CD,배치JOB코드,AD,GSGoodsJob,기프티쇼 상품 현행화 배치
+BTCH_JOB_CD,배치JOB코드,AD,GiftiShowJob,패밀리포인트 유효기간 만료쿠폰 환불
+BTCH_JOB_CD,배치JOB코드,AD,PHubToPGDnlJob,다날 일대사 배치
+BTCH_JOB_CD,배치JOB코드,AD,PHubToPGMecJob,메크로스 일대사 배치
+BTCH_JOB_CD,배치JOB코드,AD,PHubToPGSmtrJob,스마트로일대사배치
+BTCH_JOB_CD,배치JOB코드,AD,MakeFileClip,클립 대사 파일 만들기
+BTCH_JOB_CD,배치JOB코드,AD,PHubToPGPltJob,페이레터 일대사배치
+CERT_TEL_TYPE,본인인증통신사구분,PH,SKT,sk텔레콤
+CERT_TEL_TYPE,본인인증통신사구분,PH,KTF,kt
+CERT_TEL_TYPE,본인인증통신사구분,PH,LGT,lg U+
+CERT_TEL_TYPE,본인인증통신사구분,PH,SKM,skt mvno
+CERT_TEL_TYPE,본인인증통신사구분,PH,KTM,kt mvno
+CERT_TEL_TYPE,본인인증통신사구분,PH,LGM,lg U+ mvno
+CHNG_ITEM_CD,자동납부 변경항목,PH,APLY,신청
+CHNG_ITEM_CD,자동납부 변경항목,PH,TRMN,해지
+CHNG_ITEM_CD,자동납부 변경항목,PH,AMT,자동납부금액 변경
+CHNG_TYP_CD,쿠폰정보변경 유형,PF,ISSUE,발행
+CHNG_TYP_CD,쿠폰정보변경 유형,PF,USE,쿠폰사용
+CHNG_TYP_CD,쿠폰정보변경 유형,PF,CANCEL,쿠폰사용취소
+CHNG_TYP_CD,쿠폰정보변경 유형,PF,REFUND,쿠폰발행취소(환불)
+CHNG_TYP_CD,쿠폰정보변경 유형,PF,ETC,기타
+CLS_GRP_ID,약관그룹,PH,CLS000,(고정)포인트허브이용약관
+CLS_GRP_ID,약관그룹,PH,CLS001,구)기본약관그룹(삭제예정)
+CLS_GRP_ID,약관그룹,PH,CLS002,세틀뱅크약관(레거시)
+CLS_GRP_ID,약관그룹,PH,CLS003,세틀뱅크약관(차세대)
+CLS_GRP_ID,약관그룹,PH,CLS005,다날약관
+CLS_GRP_ID,약관그룹,PH,CLS006,메크로스약관
+CLS_GRP_ID,약관그룹,PH,CLS007,SHUB
+CLS_GRP_ID,약관그룹,PH,CLS008,스마트로
+CLS_GRP_ID,약관그룹,PH,CLS009,(고정)데일리픽약관
+CLS_GRP_ID,약관그룹,PH,CLS010,페이레터
+CLS_GRP_ID,약관그룹,PH,CLS011,포인트홈
+CLS_GRP_ID,약관그룹,PH,CLS012,API통신
+CLS_GRP_ID,약관그룹,PH,CLS013,API통신공통약관
+CLS_GRP_ID,약관그룹,PH,CLS014,메크로API약관전용
+CLS_GRP_ID,약관그룹,PH,CLS015,패밀리포인트
+CLS_GRP_ID,약관그룹,PH,CLS016,헥토API약관전용
+CMPN_IF_TYPE,가맹점 연동 방식,PH,API,API
+CMPN_IF_TYPE,가맹점 연동 방식,PH,UI,UI
+CMPN_IND,관계사구분,PH,PG,PG사
+CMPN_IND,관계사구분,PH,PV,포인트제공처
+CMPN_IND,관계사구분,PH,CL,포인트사용처
+CMPN_IND,관계사구분,PH,IF,I/F 서버
+CMPN_IND,관계사구분,PH,PN,개인사용자
+CMPR_PH_RST_CD,포인트허브처리결과코드,CM,S000,성공
+CMPR_RST_CD,처리결과코드,CM,S000,성공
+COM_GRP,공통코드그룹,SY,AD,어드민
+COM_GRP,공통코드그룹,SY,PG,PG사
+COM_GRP,공통코드그룹,SY,CP,클립포인트
+COM_GRP,공통코드그룹,SY,CS,클립서버
+COM_GRP,공통코드그룹,SY,CM,대사
+COM_GRP,공통코드그룹,SY,PH,포인트허브
+COM_GRP,공통코드그룹,SY,SY,시스템
+CPN_CNCL_IND,취소경로구분,PH,N,미취소
+CPN_CNCL_IND,취소경로구분,PH,Y,연동취소
+CPN_CNCL_IND,취소경로구분,PH,A,ONM취소
+CPN_CNCL_IND,취소경로구분,PH,B,배치취소
+CPN_CNCL_IND,취소경로구분,PH,M,망취소
+CPN_CNCL_IND,취소경로구분,PH,CB,매입취소
+CPN_EFF_IND,쿠폰유효기간구분,PH,DAYS,몇일간유효
+CPN_EFF_IND,쿠폰유효기간구분,PH,DATE,종료일표기
+CPN_REQ_PRGRS,진행상태,PF,PR000,미진행
+CPN_REQ_PRGRS,진행상태,PF,PR110,진행중1(본인인증 페이지)
+CPN_REQ_PRGRS,진행상태,PF,PR120,진행중2(본인인증 완료)
+CPN_REQ_PRGRS,진행상태,PF,PR130,진행중3(포인트조회 페이지)
+CPN_REQ_PRGRS,진행상태,PF,PR140,진행중4(결제요청)
+CPN_REQ_PRGRS,진행상태,PF,PR200,완료
+CPN_REQ_PRGRS,진행상태,PF,PR900,실패(결제실패)
+CPN_REQ_STAT,지원요청상태코드,PF,NON,미요청
+CPN_REQ_STAT,지원요청상태코드,PF,REQ,요청
+CPN_REQ_STAT,지원요청상태코드,PF,RE,재요청
+CPN_REQ_STAT,지원요청상태코드,PF,CAN,요청회수
+CPN_REQ_STAT,지원요청상태코드,PF,REJ,거부(피요청자
+CPN_STAT_IND,쿠폰상태,PF,0000,쿠폰생성
+CPN_STAT_IND,쿠폰상태,PF,1000,쿠폰유통
+CPN_STAT_IND,쿠폰상태,PF,2000,미사용
+CPN_STAT_IND,쿠폰상태,PF,2100,사용취소(미사용)
+CPN_STAT_IND,쿠폰상태,PF,4000,사용완료
+CPN_STAT_IND,쿠폰상태,PF,9000,발행취소(환불)
+CTRL_IND,접근제어상태구분,PH,Y,허용
+CTRL_IND,접근제어상태구분,PH,N,중지
+CTRL_IND,접근제어상태구분,PH,D,영구중지
+CUST_TYPE_CD,고객유형코드,PH,kt,KT(가족결합)
+CUST_TYPE_CD,고객유형코드,PH,kti,KT
+CUST_TYPE_CD,고객유형코드,PH,skt,SKT
+CUST_TYPE_CD,고객유형코드,PH,lgt,LGT
+CUST_TYPE_CD,고객유형코드,PH,nkt,통신사불명
+DEAL_ERR_CD,오류코드,PH,S000,성공
+DEAL_IND,거래구분,PH,PA,승인(차감)
+DEAL_IND,거래구분,PH,CA,취소(복원)
+DEAL_IND,거래구분,PH,MA,망취소(복원)
+DEAL_PG_IND,PG거래구분,PH,SI,포인트단일결제
+DEAL_PG_IND,PG거래구분,PH,CO,복합결제
+DEAL_PG_IND,PG거래구분,PH,CU,소진형
+DEAL_PG_IND,PG거래구분,PH,CO-C,내통장결제
+DEAL_REQ_STAT,거래요청상태,PH,0100,거래생성
+DEAL_REQ_STAT,거래요청상태,PH,0200,본인인증
+DEAL_REQ_STAT,거래요청상태,PH,0300,포인트조회
+DEAL_REQ_STAT,거래요청상태,PH,1000,요청
+DEAL_REQ_STAT,거래요청상태,PH,2000,승인
+DEAL_REQ_STAT,거래요청상태,PH,3000,오류취소
+ELMT_TYP,요소구분,PH,TEXT,text문구
+ELMT_TYP,요소구분,PH,HTML,html문구
+ELMT_TYP,요소구분,PH,MSG,메시지형문구
+ELMT_TYP,요소구분,PH,SRC,소스경로
+FORM_MSG_TYPE,MMS 메시지 유형,PH,MMS,MMS
+FORM_MSG_TYPE,MMS 메시지 유형,PH,SMS,SMS
+FORM_MSG_TYPE,MMS 메시지 유형,PH,PUSH,App PUSH
+GENDER_CD,성별코드,PH,0,남자
+GENDER_CD,성별코드,PH,1,여자
+IF_SYSTEM,인터페이스시스템,AD,CS0001,클립서버
+IF_SYSTEM,인터페이스시스템,AD,CP0001,클립포인트
+IF_SYSTEM,인터페이스시스템,AD,PG0001,세틀뱅크
+IF_SYSTEM,인터페이스시스템,AD,SHB001,SHUB
+IF_SYSTEM,인터페이스시스템,AD,KOS001,KOS
+KMC_URL_ID,KMC 인증유형(KMC_URL_ID),AD,006001,ALL(SMS인증  간편인증  P
+KMC_URL_ID,KMC 인증유형(KMC_URL_ID),AD,006004,PASS Only
+KMC_URL_ID,KMC 인증유형(KMC_URL_ID),AD,013001,포인트홈_KMC아이디
+LOGIN_STAT,로그인상태,AD,IS,로그인 성공
+LOGIN_STAT,로그인상태,AD,IF,로그인 실패
+LOGIN_STAT,로그인상태,AD,OS,로그아웃 성공
+LOGIN_STAT,로그인상태,AD,OF,로그아웃 실패
+MENU_IND,메뉴구분,AD,PH,포인트허브
+MENU_IND,메뉴구분,AD,CMS,관리자
+MENU_LVL,메뉴레벨,AD,1,Level1
+MENU_LVL,메뉴레벨,AD,2,Level2
+MENU_LVL,메뉴레벨,AD,3,Level3
+MOT_ITEM_TYPE,아이템유형,PH,CHR,문자
+MOT_ITEM_TYPE,아이템유형,PH,NUM,숫자
+MOT_TYPE,전문유형,PH,JSON,json
+MOT_TYPE,전문유형,PH,FIXL,fixed length
+MOT_USE_IND,전문용도구분,PH,CS,클립서버
+MOT_USE_IND,전문용도구분,PH,CP,클립포인트
+MOT_USE_IND,전문용도구분,PH,SB,세틀뱅크(PG)
+MOT_USE_IND,전문용도구분,PH,KMC,KMC(본인인증)
+MOT_USE_IND,전문용도구분,PH,PH,포인트허브
+MOT_USE_IND,전문용도구분,PH,GS,기프티쇼
+MOT_USE_IND,전문용도구분,PH,KS,KOS
+MOT_USE_IND,전문용도구분,PH,SH,S-HUB
+MOT_USE_IND,전문용도구분,PH,DNL,다날(PG)
+MOT_USE_IND,전문용도구분,PH,MEC,메크로스
+MOT_USE_IND,전문용도구분,PH,PLT,페이레터
+MOT_USE_IND,전문용도구분,PH,PNTH,포인트홈
+MOT_USE_IND,전문용도구분,PH,SMTR,스마트로
+MSG_GRP,메시지그룹,SY,AD,어드민
+MSG_GRP,메시지그룹,SY,IF,연동
+MSG_GRP,메시지그룹,SY,CM,대사
+MSG_GRP,메시지그룹,SY,BZ,Biz
+MSG_GRP,메시지그룹,SY,SY,시스템
+MSG_GRP,메시지그룹,SY,CP,클립포인트
+MSG_TYPE,메시지구분,SY,DEBUG,DEBUG
+MSG_TYPE,메시지구분,SY,INFO,INFO
+MSG_TYPE,메시지구분,SY,WARN,WARN
+MSG_TYPE,메시지구분,SY,ERROR,ERROR
+MSG_TYPE,메시지구분,SY,FATAL,FATAL
+MULTI_LOG_TYPE,단건/다량구분,AD,SINGL,단건
+MULTI_LOG_TYPE,단건/다량구분,AD,MUCH,다량
+MYOTHCMP_IND,자/타사구분,PH,kt,자사
+MYOTHCMP_IND,자/타사구분,PH,nkt,타사
+NATION_CD,내/외국인코드,PH,0,내국인
+NATION_CD,내/외국인코드,PH,1,외국인
+PAY_TYPE_CD,납부유형코드,PH,DRCT,바로납부
+PAY_TYPE_CD,납부유형코드,PH,AUTO,자동납부
+PAY_TYPE_CD,납부유형코드,PH,PREPAY,제휴납부
+PH_SVC_CD,포인트허브서비스유형,PH,SVC_BASE,포인트허브
+PH_SVC_CD,포인트허브서비스유형,PH,SVC_FP,패밀리포인트
+PH_SVC_CD,포인트허브서비스유형,PH,SVC_BENEFI,KT통신비할인
+PNT_CPRT_ATTR,사용처속성정보,SY,AUTH_DIV,인증구분
+PRMT_GRP,파라미터그룹,SY,AD,어드민
+PRMT_GRP,파라미터그룹,SY,PG,PG사
+PRMT_GRP,파라미터그룹,SY,CP,클립포인트
+PRMT_GRP,파라미터그룹,SY,CS,클립서버
+PRMT_GRP,파라미터그룹,SY,CM,대사
+PRMT_GRP,파라미터그룹,SY,PH,포인트허브
+PRMT_GRP,파라미터그룹,SY,BC,배치
+PRMT_GRP,파라미터그룹,SY,KMC,KMC
+PRMT_GRP,파라미터그룹,SY,SY,시스템
+PRMT_GRP,파라미터그룹,SY,FP,패밀리포인트
+RCHR_PAY_IND,충전결제구분,PH,RE,충전
+RCHR_PAY_IND,충전결제구분,PH,PA,결제
+SEND_RECV_PLC,수/발신처,AD,PH,포인트허브
+SEND_RECV_PLC,수/발신처,AD,CS,클립서버
+SEND_RECV_PLC,수/발신처,AD,CP,클립포인트
+SEND_RECV_PLC,수/발신처,AD,SB,세틀뱅크(PG)
+SEND_RECV_PLC,수/발신처,AD,KMC,KMC(본인인증)
+SEND_RECV_PLC,수/발신처,AD,GS,기프티쇼
+SEND_RECV_PLC,수/발신처,AD,KS,KOS
+SEND_RECV_PLC,수/발신처,AD,SH,S-HUB
+SEND_RECV_PLC,수/발신처,AD,DNL,다날(PG)
+SEND_RECV_PLC,수/발신처,AD,MEC,메크로스(PG)
+SEND_RECV_PLC,수/발신처,AD,KD,K-DEAL
+SEND_RECV_PLC,수/발신처,AD,SMTR,스마트로(PG)
+SEND_RECV_PLC,수/발신처,AD,PLT,페이레터(PG)
+SEND_RECV_PLC,수/발신처,AD,PNTH,포인트홈
+STAT_CD,상태코드,AD,1000,사용
+STAT_CD,상태코드,AD,2000,삭제
+STAT_CD,상태코드,AD,4000,중단
+TIMEZONE_HOUR,타임존(시간),SY,00,00시
+TIMEZONE_HOUR,타임존(시간),SY,01,01시
+TIMEZONE_HOUR,타임존(시간),SY,02,02시
+TIMEZONE_HOUR,타임존(시간),SY,03,03시
+TIMEZONE_HOUR,타임존(시간),SY,04,04시
+TIMEZONE_HOUR,타임존(시간),SY,05,05시
+TIMEZONE_HOUR,타임존(시간),SY,06,06시
+TIMEZONE_HOUR,타임존(시간),SY,07,07시
+TIMEZONE_HOUR,타임존(시간),SY,08,08시
+TIMEZONE_HOUR,타임존(시간),SY,09,09시
+TIMEZONE_HOUR,타임존(시간),SY,10,10시
+TIMEZONE_HOUR,타임존(시간),SY,11,11시
+TIMEZONE_HOUR,타임존(시간),SY,12,12시
+TIMEZONE_HOUR,타임존(시간),SY,13,13시
+TIMEZONE_HOUR,타임존(시간),SY,14,14시
+TIMEZONE_HOUR,타임존(시간),SY,15,15시
+TIMEZONE_HOUR,타임존(시간),SY,16,16시
+TIMEZONE_HOUR,타임존(시간),SY,17,17시
+TIMEZONE_HOUR,타임존(시간),SY,18,18시
+TIMEZONE_HOUR,타임존(시간),SY,19,19시
+TIMEZONE_HOUR,타임존(시간),SY,20,20시
+TIMEZONE_HOUR,타임존(시간),SY,21,21시
+TIMEZONE_HOUR,타임존(시간),SY,22,22시
+TIMEZONE_HOUR,타임존(시간),SY,23,23시
+TIMEZONE_MINUTE,타임존(분),SY,00,00분
+TIMEZONE_MINUTE,타임존(분),SY,10,10분
+TIMEZONE_MINUTE,타임존(분),SY,20,20분
+TIMEZONE_MINUTE,타임존(분),SY,30,30분
+TIMEZONE_MINUTE,타임존(분),SY,40,40분
+TIMEZONE_MINUTE,타임존(분),SY,50,50분
+URI_METHOD,URI구분,AD,SRCH,조회
+URI_METHOD,URI구분,AD,RGST,등록
+URI_METHOD,URI구분,AD,DEL,삭제
+URI_METHOD,URI구분,AD,EXCD,엑셀다운로드
+URI_METHOD,URI구분,AD,MDFY,수정
+USER_DEPT,부서코드,AD,9999,포인트허브 프로젝트팀
+USER_DEPT,부서코드,AD,9001,KT검증팀
+USER_DEPT,부서코드,AD,9002,KT보안검증팀
+USER_DEPT,부서코드,AD,0001,금융중개사업팀
+USER_DEPT,부서코드,AD,0002,PG사VOC
+USER_GRP,사용자그룹,AD,BIZ01,사업담당자
+USER_GRP,사용자그룹,AD,BIZ02,사업/제휴담당자
+USER_GRP,사용자그룹,AD,OPR,Operater
+USER_GRP,사용자그룹,AD,DEV,Developer
+USER_GRP,사용자그룹,AD,ADM,Admin
+USER_GRP,사용자그룹,AD,BIZ03,검증팀
+USER_GRP,사용자그룹,AD,VOCSB,VOC그룹(세틀뱅크)
+USER_GRP,사용자그룹,AD,VOCDNL,VOC그룹(다날)
+USER_GRP,사용자그룹,AD,VOCMEC,VOC그룹(메크로스)
+USER_GRP,사용자그룹,AD,BIZ04,VOC그룹
+USER_GRP,사용자그룹,AD,VOCPLT,VOC그룹(페이레터)

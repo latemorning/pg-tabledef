@@ -1,0 +1,95 @@
+[
+  {
+    "column_name": "rgst_user_id",
+    "attribute_name": "등록자ID",
+    "attr_type": "RELATION",
+    "rel_val": "사용자정보.사용자ID"
+  },
+  {
+    "column_name": "mdfy_user_id",
+    "attribute_name": "수정자ID",
+    "attr_type": "RELATION",
+    "rel_val": "사용자정보.사용자ID"
+  },
+  {
+    "column_name": "use_yn",
+    "attribute_name": "사용여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "dp_yn",
+    "attribute_name": "노출여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "login_yn",
+    "attribute_name": "로그인여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "otp_auth_yn",
+    "attribute_name": "OTP인증여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "captcha_auth_yn",
+    "attribute_name": "CAPTCHA인증여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "ldap_auth_yn",
+    "attribute_name": "LDAP인증여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "rgst_yn",
+    "attribute_name": "등록권한",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "read_yn",
+    "attribute_name": "보기권한",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "mdfy_yn",
+    "attribute_name": "수정권한",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "exp_yn",
+    "attribute_name": "엑스포트권한여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "pnt_cd",
+    "attribute_name": "포인트코드",
+    "attr_type": "RELATION",
+    "rel_val": "포인트제공처.포인트코드"
+  },
+  {
+    "column_name": "log_write_yn",
+    "attribute_name": "로그기록여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  },
+  {
+    "column_name": "logcntr_if_yn",
+    "attribute_name": "로그센터연동여부",
+    "attr_type": "",
+    "rel_val": "['Y', 'N']"
+  }
+
+
+
+]
