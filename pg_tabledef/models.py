@@ -42,4 +42,6 @@ class TableDef:
     pk_constraint_name: str = ""  # PK 제약조건명 (ALTER TABLE ... ADD CONSTRAINT {name})
     indexes: list[IndexDef] = field(default_factory=list)
     fk_list: list[FKInfo] = field(default_factory=list)  # Key List 섹션용
-    comment_ai: bool = False  # True이면 AI가 추론한 comment
+    comment_ai: bool = False       # True이면 AI가 추론한 comment
+    entity_class: str = ""         # 엔티티분류 (KEY / MAIN / ACTION)
+    entity_class_ai: bool = False  # True이면 AI가 추론한 entity_class

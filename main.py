@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 from pg_tabledef.parser import parse_files, filter_excluded
-from pg_tabledef.enricher import enrich
+from pg_tabledef.enricher import enrich, enrich_entity_class
 from pg_tabledef.writer.excel import ExcelWriter
 
 
@@ -45,6 +45,7 @@ def main() -> None:
 
     print(f"[INFO] AI 보완 중...")
     tables = enrich(tables)
+    tables = enrich_entity_class(tables)
 
     writer = ExcelWriter()
     writer.write(tables)

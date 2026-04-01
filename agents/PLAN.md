@@ -250,7 +250,7 @@ ddl-diff의 `_TYPE_MAP` + `_extract_type_str` 로직 재사용.
 
 ### 섹션 1: 테이블 정보 헤더 (3행)
 
-샘플(`template/sample.xlsx`) 기준 레이아웃. 병합 셀 포함.
+레이아웃. 병합 셀 포함.
 
 ```
 Row 1: [A1]Table 명 | [B1]{table_name} | [C1]TableSpace | [D1:E1]   | [F1:G1]Sub System | [H1]   | [I1]주제영역명 | [J1]  | [K1]주제영역명약어 | [L1]
@@ -352,7 +352,7 @@ Row 3: [A3]Entity 정의 | [B3:L3]                                              
 
 ## 컬럼 너비
 
-샘플(`template/sample.xlsx`) 기준:
+컬럼 너비 기준:
 
 | 열 | 항목 | 너비 |
 |----|------|------|
@@ -426,6 +426,63 @@ Row 3: [A3]Entity 정의 | [B3:L3]                                              
 > 길이는 `ColumnDef.length` 필드에 별도 저장 — Type 열에는 약식(`VC`, `DEC`)만, Length 열에 숫자만 출력
 
 ---
+
+---
+
+## 엔티티분류 (`rules/entity_class_rules.json`)
+
+### 개요
+
+테이블 헤더 Row 2 J열(col 10)에 엔티티분류 값(`KEY` / `MAIN` / `ACTION`) 출력.
+
+| 값 | 의미 |
+|----|------|
+| `KEY` | 기준/코드성 테이블 (코드값, 설정, 분류 기준 데이터) |
+| `MAIN` | 핵심 비즈니스 엔티티 테이블 (고객, 상품, 계약 등) |
+| `ACTION` | 트랜잭션/이력/로그 테이블 (_hist, _log, _ptcl 등) |
+
+### 규칙 파일 (`rules/entity_class_rules.json`)
+
+```json
+{
+  "테이블명_소문자": "KEY"
+}
+```
+
+- 키: 테이블명 소문자
+- 값: `KEY` / `MAIN` / `ACTION`
+- AI 추론 결과가 자동으로 누적 저장됨 (이후 재실행 시 JSON 우선 사용)
+
+### 처리 흐름 (`enrich_entity_class()` in `enricher.py`)
+
+1. `rules/entity_class_rules.json` 로드
+2. 각 테이블명(소문자)을 JSON에서 조회
+   - 있으면: `entity_class` 설정, `entity_class_ai = False`
+   - 없으면: AI 추론 대상 목록에 추가
+3. AI 추론 (`ANTHROPIC_API_KEY` 없으면 스킵)
+   - 테이블명, 테이블 설명, 컬럼 목록을 컨텍스트로 전달
+   - `KEY` / `MAIN` / `ACTION` 중 하나 반환
+   - `entity_class_ai = True` 플래그 설정
+4. 새 AI 추론값을 JSON 파일에 저장
+
+### models.py 추가 필드
+
+```python
+entity_class: str = ""         # 엔티티분류 (KEY / MAIN / ACTION)
+entity_class_ai: bool = False  # True이면 AI가 추론한 값
+```
+
+### excel.py 적용
+
+- Row 2 J열(col 10): `table.entity_class` 출력
+- `entity_class_ai is True`이면 **주황색 글씨** (`FONT_AI_SUGGESTED`)
+
+### main.py 호출 순서
+
+```python
+tables = enrich(tables)          # 빈 코멘트/attribute_name AI 보완
+tables = enrich_entity_class(tables)  # 엔티티분류 결정
+```
 
 ---
 

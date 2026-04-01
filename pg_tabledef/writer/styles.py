@@ -1,4 +1,4 @@
-"""pg_tabledef.writer.styles: openpyxl 스타일 상수 (template/sample.xlsx 기준)."""
+"""pg_tabledef.writer.styles: openpyxl 스타일 상수."""
 from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
 from openpyxl.styles.colors import Color
 
@@ -20,7 +20,7 @@ ALIGN_LEFT_NO_WRAP = Alignment(horizontal="left",  vertical="center")
 ALIGN_RIGHT       = Alignment(horizontal="right",  vertical="center")
 
 # ──────────────────────────────────────────────────────────────────────────────
-# 배경색 (template/sample.xlsx: theme0 + tint -0.35 = 어두운 헤더)
+# 배경색 (theme=0 + tint=-0.35 → 어두운 헤더)
 # ──────────────────────────────────────────────────────────────────────────────
 FILL_HEADER = PatternFill(fill_type="solid", fgColor=Color(theme=0, tint=-0.35))
 

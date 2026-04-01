@@ -1,6 +1,6 @@
 """pg_tabledef.writer.excel: list[TableDef] → output/테이블정의서.xlsx.
 
-레이아웃 구조 (테이블 1개 기준, template/sample.xlsx 기준):
+레이아웃 구조 (테이블 1개 기준):
   Row +1 : Table 명 / TableSpace / Sub System / 주제영역명 / 주제영역명약어
   Row +2 : Entity 명 / 최초작성일 / 최종수정일 / 엔티티분류 / 오너쉽
   Row +3 : Entity 정의 (높이 120, B:L 병합)
@@ -171,10 +171,11 @@ class ExcelWriter:
         self._wc(ws, r, 6,  "최종수정일",   align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)  # F:G 병합
         ws.merge_cells(start_row=r, start_column=6, end_row=r, end_column=7)
         self._wc(ws, r, 8,  "",             align=S.ALIGN_CENTER)  # 최종수정일 값
-        self._wc(ws, r, 9,  "엔티티분류",   align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
-        self._wc(ws, r, 10, "",             align=S.ALIGN_CENTER)
-        self._wc(ws, r, 11, "오너쉽",       align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
-        self._wc(ws, r, 12, "",             align=S.ALIGN_CENTER)
+        entity_font = S.FONT_AI_SUGGESTED if table.entity_class_ai else None
+        self._wc(ws, r, 9,  "엔티티분류",        align=S.ALIGN_CENTER, fill=S.FILL_HEADER)
+        self._wc(ws, r, 10, table.entity_class,   align=S.ALIGN_CENTER, font=entity_font)
+        self._wc(ws, r, 11, "오너쉽",             align=S.ALIGN_CENTER, fill=S.FILL_HEADER)
+        self._wc(ws, r, 12, "",                    align=S.ALIGN_CENTER)
         r += 1
 
         # Row 3: Entity 정의 | [B:L 병합 빈칸] (높이 120)

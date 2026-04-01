@@ -126,7 +126,7 @@ ALIGN_CENTER       = Alignment(horizontal="center", vertical="center")
 ALIGN_LEFT         = Alignment(horizontal="left",   vertical="center", wrap_text=True)
 ALIGN_LEFT_NO_WRAP = Alignment(horizontal="left",   vertical="center")
 
-# 배경색 (template/sample.xlsx 기준: theme=0 + tint=-0.35 → 어두운 헤더)
+# 배경색 (theme=0 + tint=-0.35 → 어두운 헤더)
 FILL_HEADER = PatternFill(fill_type="solid", fgColor=Color(theme=0, tint=-0.35))
 
 # 테두리 (thin 전체)
@@ -148,6 +148,11 @@ COL_WIDTHS = {
     "L": 15.0,  # Source
 }
 ```
+
+### `rules/entity_class_rules.json`
+
+테이블명(소문자) → 엔티티분류(`KEY`/`MAIN`/`ACTION`) 매핑 파일.
+AI 추론 결과가 자동 누적 저장됨. 구조 및 처리 흐름은 `PLAN.md` "엔티티분류" 섹션 참조.
 
 ### `rules/table_subject_rules.json`
 
@@ -253,4 +258,5 @@ argparse 불필요. 입출력 경로 고정.
 | pg_tabledef/writer/styles.py | ✅ 완료 | openpyxl 스타일 상수 |
 | pg_tabledef/writer/excel.py | ✅ 완료 | ExcelWriter (3섹션 레이아웃) |
 | main.py | ✅ 완료 | CLI 진입점, 107테이블 출력 확인 |
+| rules/entity_class_rules.json | ✅ 완료 | 엔티티분류 수동 매핑 + AI 추론값 캐시 |
 | rules/table_subject_rules.json | ✅ 완료 | H/J/L열 주제영역 매핑 규칙 |
