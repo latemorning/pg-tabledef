@@ -14,7 +14,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from pg_tabledef.parser import parse_files
+from pg_tabledef.parser import parse_files, filter_excluded
+from pg_tabledef.enricher import enrich
 from pg_tabledef.writer.excel import ExcelWriter
 
 
@@ -35,6 +36,15 @@ def main() -> None:
     if not tables:
         print("[WARN] 파싱된 테이블이 없습니다.")
         sys.exit(0)
+
+    tables = filter_excluded(tables)
+
+    if not tables:
+        print("[WARN] 제외 후 테이블이 없습니다.")
+        sys.exit(0)
+
+    print(f"[INFO] AI 보완 중...")
+    tables = enrich(tables)
 
     writer = ExcelWriter()
     writer.write(tables)

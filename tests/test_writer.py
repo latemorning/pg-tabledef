@@ -1,5 +1,5 @@
 import openpyxl
-from pg_tabledef.writer.excel import ExcelWriter
+from pg_tabledef.writer.excel import ExcelWriter, _resolve_subject
 
 
 class TestSheetStructure:
@@ -81,6 +81,71 @@ class TestTableSeparation:
         }
         assert "customers" in all_values
         assert "orders" in all_values
+
+
+class TestSubjectRules:
+    """table_subject_rules.json 기반 H/J/L열 매핑 검증."""
+
+    def test_adm_prefix(self):
+        sub, area, abbr = _resolve_subject("adm_user")
+        assert sub == "ONM"
+        assert area == "ONM"
+        assert abbr == "ADM"
+
+    def test_ph_prefix(self):
+        sub, area, abbr = _resolve_subject("ph_pnt_info")
+        assert sub == "PHUB"
+        assert area == "포인트허브"
+        assert abbr == "PH"
+
+    def test_st_prefix(self):
+        sub, area, abbr = _resolve_subject("st_daily_stat")
+        assert sub == "ONM"
+        assert area == "통계"
+        assert abbr == "ST"
+
+    def test_cmpr_contains(self):
+        sub, area, abbr = _resolve_subject("cl_cmpr_fail")
+        assert sub == "CMPR"
+        assert area == "일대사"
+        assert abbr == "CMPR"
+
+    def test_fp_prefix(self):
+        sub, area, abbr = _resolve_subject("fp_mileage")
+        assert sub == ""
+        assert area == "패밀리포인트"
+        assert abbr == "FP"
+
+    def test_ex_strip_then_adm(self):
+        """EX_ 제거 후 ADM_ 매칭."""
+        sub, area, abbr = _resolve_subject("ex_adm_log")
+        assert abbr == "ADM"
+
+    def test_ex_strip_then_ph(self):
+        """EX_ 제거 후 PH_ 매칭."""
+        sub, area, abbr = _resolve_subject("EX_PH_HIST")
+        assert abbr == "PH"
+
+    def test_no_match_returns_empty(self):
+        sub, area, abbr = _resolve_subject("unknown_table")
+        assert sub == "" and area == "" and abbr == ""
+
+    def test_subject_values_in_excel_header(self, tmp_path):
+        """ADM_ 테이블은 H/J/L열에 ONM/ONM/ADM이 출력됨."""
+        from pg_tabledef.models import TableDef, ColumnDef
+        table = TableDef(
+            name="adm_test",
+            comment="테스트",
+            columns=[ColumnDef(no=1, name="id", attribute_name="아이디",
+                               type_str="INT", length="", not_null=True,
+                               is_pk=True, is_uk=False, fk_info=None)],
+        )
+        out = tmp_path / "out.xlsx"
+        ExcelWriter(out).write([table])
+        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
+        row1_vals = {ws.cell(1, c).value for c in range(1, 13)}
+        assert "ONM" in row1_vals
+        assert "ADM" in row1_vals
 
 
 class TestTableCompleteness:

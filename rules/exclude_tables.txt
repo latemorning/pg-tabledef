@@ -1,0 +1,6 @@
+k_deal_dailypick_sign_cust_info
+kcoin_auto_pay_chng_hist
+kcoin_auto_pay_info
+kcoin_pay_ptcl
+ph_pnt_cust_ctn_tmp
+ph_pnt_cust_ctn_tmp2

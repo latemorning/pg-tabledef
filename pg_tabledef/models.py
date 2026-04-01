@@ -23,6 +23,7 @@ class ColumnDef:
     is_pk: bool
     is_uk: bool
     fk_info: Optional[FKInfo]
+    attribute_name_ai: bool = False  # True이면 AI가 추론한 attribute_name
 
 
 @dataclass
@@ -41,3 +42,4 @@ class TableDef:
     pk_constraint_name: str = ""  # PK 제약조건명 (ALTER TABLE ... ADD CONSTRAINT {name})
     indexes: list[IndexDef] = field(default_factory=list)
     fk_list: list[FKInfo] = field(default_factory=list)  # Key List 섹션용
+    comment_ai: bool = False  # True이면 AI가 추론한 comment

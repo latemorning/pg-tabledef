@@ -149,15 +149,33 @@ COL_WIDTHS = {
 }
 ```
 
+### `rules/table_subject_rules.json`
+
+테이블명 패턴 → H열(Sub System), J열(주제영역명), L열(주제영역명약어) 매핑 규칙 파일.
+구조 및 규칙 상세는 `PLAN.md` "테이블 주제영역 매핑" 섹션 참조.
+
 ### `pg_tabledef/writer/excel.py`
 
 `ExcelWriter` — `list[TableDef]`를 받아 `./output/테이블정의서.xlsx` 저장.
 
 **섹션별 private 메서드:**
 - `_write_table_header(ws, row, table)` → 섹션 1 (테이블 정보)
+  - `_resolve_subject(table.name)` 로 H열(Sub System), J열(주제영역명), L열(주제영역명약어) 결정
 - `_write_key_list(ws, row, table)` → 섹션 2 (Key List)
 - `_write_columns(ws, row, table)` → 섹션 3 (컬럼 목록, PK 행 bold)
+  - G열 Keys 표시: `is_pk` → `"PK"`, `is_uk` → `"UK"`, `fk_info` → `"FK"`, 복합 시 `,`로 연결 (예: `"PK,FK"`)
 - `_apply_column_widths(ws)` → 컬럼 너비 적용
+
+**주제영역 매핑 함수:**
+```python
+def _load_subject_rules() -> dict:
+    """rules/table_subject_rules.json 로드. 파일 없으면 빈 규칙 반환."""
+
+def _resolve_subject(table_name: str) -> tuple[str, str, str]:
+    """테이블명 → (sub_system, subject_area, subject_area_abbr).
+    strip_prefixes 제거 후 rules 배열 순서대로 첫 번째 매칭 반환. 없으면 ("", "", "").
+    """
+```
 
 **Key List 출력 규칙 (`_write_key_list`):**
 
@@ -234,4 +252,5 @@ argparse 불필요. 입출력 경로 고정.
 | pg_tabledef/writer/__init__.py | ✅ 완료 | |
 | pg_tabledef/writer/styles.py | ✅ 완료 | openpyxl 스타일 상수 |
 | pg_tabledef/writer/excel.py | ✅ 완료 | ExcelWriter (3섹션 레이아웃) |
-| main.py | ✅ 완료 | CLI 진입점, 434테이블 출력 확인 |
+| main.py | ✅ 완료 | CLI 진입점, 107테이블 출력 확인 |
+| rules/table_subject_rules.json | ✅ 완료 | H/J/L열 주제영역 매핑 규칙 |

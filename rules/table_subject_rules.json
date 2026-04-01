@@ -1,0 +1,50 @@
+{
+  "_comment": "테이블명 기반 H열(Sub System), J열(주제영역명), L열(주제영역명약어) 자동 매핑 규칙. 우선순위: 배열 순서대로 (먼저 일치하는 규칙 적용).",
+
+  "strip_prefixes": [
+    "EX_"
+  ],
+
+  "rules": [
+    {
+      "_comment": "ADM_ 접두사",
+      "type": "prefix",
+      "pattern": "ADM_",
+      "sub_system": "ONM",
+      "subject_area": "ONM",
+      "subject_area_abbr": "ADM"
+    },
+    {
+      "_comment": "PH_ 접두사",
+      "type": "prefix",
+      "pattern": "PH_",
+      "sub_system": "PHUB",
+      "subject_area": "포인트허브",
+      "subject_area_abbr": "PH"
+    },
+    {
+      "_comment": "ST_ 접두사",
+      "type": "prefix",
+      "pattern": "ST_",
+      "sub_system": "ONM",
+      "subject_area": "통계",
+      "subject_area_abbr": "ST"
+    },
+    {
+      "_comment": "_CMPR_ 포함 (접두사 무관)",
+      "type": "contains",
+      "pattern": "_CMPR_",
+      "sub_system": "CMPR",
+      "subject_area": "일대사",
+      "subject_area_abbr": "CMPR"
+    },
+    {
+      "_comment": "FP_ 접두사",
+      "type": "prefix",
+      "pattern": "FP_",
+      "sub_system": "",
+      "subject_area": "패밀리포인트",
+      "subject_area_abbr": "FP"
+    }
+  ]
+}

@@ -156,18 +156,12 @@ class TestParseColumns:
         assert sample_table_def.columns[0].attribute_name == "주문ID"
 
     def test_column_without_comment_is_empty_string(self, tmp_path):
-        """컬럼 코멘트 없으면 attribute_name = '', description = ''."""
+        """컬럼 코멘트 없으면 attribute_name = ''."""
         sql = tmp_path / "no_col_comment.sql"
         sql.write_text("create table t (id integer not null);")
         from pg_tabledef.parser import parse_files
         col = parse_files(str(tmp_path))[0].columns[0]
         assert col.attribute_name == ""
-        assert col.description == ""
-
-    def test_column_description_equals_attribute_name(self, sample_table_def):
-        """description은 attribute_name과 동일."""
-        col = sample_table_def.columns[0]
-        assert col.description == col.attribute_name
 
     def test_not_null(self, sample_table_def):
         """order_id는 NOT NULL."""
@@ -185,18 +179,25 @@ class TestParseColumns:
 class TestParseTypeFormat:
     """_format_type 변환 규칙 검증 (PLAN.md 타입 표시 포맷 기준)."""
 
-    def test_varchar_to_vc(self, customers_table_def):
+    def test_varchar_type_str(self, customers_table_def):
+        """varchar → type_str='VC', length별도."""
         col = next(c for c in customers_table_def.columns if c.name == "cust_id")
         assert col.type_str == "VC"
+
+    def test_varchar_length(self, customers_table_def):
+        """varchar(12) → length='12'."""
+        col = next(c for c in customers_table_def.columns if c.name == "cust_id")
         assert col.length == "12"
 
     def test_integer_to_int(self, sample_table_def):
         col = next(c for c in sample_table_def.columns if c.name == "order_id")
         assert col.type_str == "INT"
+        assert col.length == ""
 
     def test_timestamp_to_ts(self, sample_table_def):
         col = next(c for c in sample_table_def.columns if c.name == "order_dt")
         assert col.type_str == "TS"
+        assert col.length == ""
 
 class TestParseConstraints:
     def test_pk_column_flagged(self, sample_table_def):
@@ -481,6 +482,6 @@ pytest tests/test_writer.py -v
 | tests/conftest.py | ✅ 완료 | - |
 | tests/fixtures/sample.sql | ✅ 완료 | - |
 | tests/test_parser.py | ✅ 완료 | 27/27 |
-| tests/test_writer.py | ✅ 완료 | 11/11 |
+| tests/test_writer.py | ✅ 완료 | 19/19 (TestSubjectRules 9개 추가) |
 
 **버그 수정**: `parser.py::_parse_constraint` — FK 로컬 컬럼을 `con.keys` 대신 `con.fk_attrs`에서 읽도록 수정 (pglast FK AST 구조 오류).

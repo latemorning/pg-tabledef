@@ -69,8 +69,44 @@ def _load_dtl_code_rules() -> tuple[dict[str, list[str]], dict[str, tuple[str, l
     return by_name, by_attr
 
 
+def _load_subject_rules() -> dict:
+    """rules/table_subject_rules.json 로드."""
+    path = _RULES_DIR / "table_subject_rules.json"
+    if not path.exists():
+        return {"strip_prefixes": [], "rules": []}
+    with path.open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _resolve_subject(table_name: str) -> tuple[str, str, str]:
+    """테이블명 → (sub_system, subject_area, subject_area_abbr).
+
+    strip_prefixes 제거 후 rules 배열 순서대로 첫 번째 매칭 반환.
+    매칭 없으면 ("", "", "").
+    """
+    name = table_name.upper()
+    for prefix in _SUBJECT_RULES.get("strip_prefixes", []):
+        if name.startswith(prefix.upper()):
+            name = name[len(prefix):]
+            break
+    for rule in _SUBJECT_RULES.get("rules", []):
+        pattern = rule["pattern"].upper()
+        matched = (
+            name.startswith(pattern) if rule.get("type") == "prefix"
+            else pattern in name
+        )
+        if matched:
+            return (
+                rule.get("sub_system", ""),
+                rule.get("subject_area", ""),
+                rule.get("subject_area_abbr", ""),
+            )
+    return ("", "", "")
+
+
 _COLUMN_RULES = _load_column_rules()
 _DTL_BY_NAME, _DTL_BY_ATTR = _load_dtl_code_rules()
+_SUBJECT_RULES = _load_subject_rules()
 
 if TYPE_CHECKING:
     from openpyxl.worksheet.worksheet import Worksheet
@@ -108,25 +144,27 @@ class ExcelWriter:
     def _write_table_header(self, ws: "Worksheet", row: int, table: TableDef) -> int:
         # Row 1: Table 명 | {name} | TableSpace | [D:E blank] | Sub System | [H blank] | 주제영역명 | [J blank] | 주제영역명약어 | [L blank]
         r = row
+        sub_system, subject_area, subject_area_abbr = _resolve_subject(table.name)
         ws.row_dimensions[r].height = S.ROW_HEIGHT_DEFAULT
-        self._wc(ws, r, 1,  "Table 명",      align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
-        self._wc(ws, r, 2,  table.name,       align=S.ALIGN_LEFT_NO_WRAP)
-        self._wc(ws, r, 3,  "TableSpace",     align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
-        self._wc(ws, r, 4,  "",               align=S.ALIGN_CENTER)  # TableSpace 값
+        self._wc(ws, r, 1,  "Table 명",       align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
+        self._wc(ws, r, 2,  table.name,        align=S.ALIGN_LEFT_NO_WRAP)
+        self._wc(ws, r, 3,  "TableSpace",      align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
+        self._wc(ws, r, 4,  "",                align=S.ALIGN_CENTER)  # TableSpace 값
         ws.merge_cells(start_row=r, start_column=4, end_row=r, end_column=5)
-        self._wc(ws, r, 6,  "Sub System",     align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)  # F:G 병합
+        self._wc(ws, r, 6,  "Sub System",      align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)  # F:G 병합
         ws.merge_cells(start_row=r, start_column=6, end_row=r, end_column=7)
-        self._wc(ws, r, 8,  "",               align=S.ALIGN_CENTER)  # Sub System 값
-        self._wc(ws, r, 9,  "주제영역명",      align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
-        self._wc(ws, r, 10, "",               align=S.ALIGN_CENTER)  # 주제영역명 값
-        self._wc(ws, r, 11, "주제영역명약어",  align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
-        self._wc(ws, r, 12, "",               align=S.ALIGN_CENTER)  # 주제영역명약어 값
+        self._wc(ws, r, 8,  sub_system,         align=S.ALIGN_CENTER)  # Sub System 값
+        self._wc(ws, r, 9,  "주제영역명",       align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
+        self._wc(ws, r, 10, subject_area,        align=S.ALIGN_CENTER)  # 주제영역명 값
+        self._wc(ws, r, 11, "주제영역명약어",   align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
+        self._wc(ws, r, 12, subject_area_abbr,   align=S.ALIGN_CENTER)  # 주제영역명약어 값
         r += 1
 
         # Row 2: Entity 명 | {comment} | 최초작성일 | [D:E blank] | 최종수정일 | [H blank] | 엔티티분류 | [J blank] | 오너쉽 | [L blank]
         ws.row_dimensions[r].height = S.ROW_HEIGHT_DEFAULT
+        comment_font = S.FONT_AI_SUGGESTED if table.comment_ai else None
         self._wc(ws, r, 1,  "Entity 명",   align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
-        self._wc(ws, r, 2,  table.comment, align=S.ALIGN_LEFT_NO_WRAP)
+        self._wc(ws, r, 2,  table.comment, align=S.ALIGN_LEFT_NO_WRAP, font=comment_font)
         self._wc(ws, r, 3,  "최초작성일",   align=S.ALIGN_CENTER,      fill=S.FILL_HEADER)
         self._wc(ws, r, 4,  "",             align=S.ALIGN_CENTER)  # 최초작성일 값
         ws.merge_cells(start_row=r, start_column=4, end_row=r, end_column=5)
@@ -280,6 +318,7 @@ class ExcelWriter:
             (8, "인포타입명"),
             (9, "Description"),
             (12, "Source"),
+            (13, "COMMENT SQL"),
         ]
         for col_idx, label in single_headers:
             self._wc(ws, r, col_idx, label, align=S.ALIGN_CENTER, fill=S.FILL_HEADER)
@@ -292,18 +331,29 @@ class ExcelWriter:
         ws.row_dimensions[r].height = S.ROW_HEIGHT_DEFAULT
         self._wc(ws, r, 10, "Attribute Type",   align=S.ALIGN_CENTER, fill=S.FILL_HEADER)
         self._wc(ws, r, 11, "Relation & Value",  align=S.ALIGN_CENTER, fill=S.FILL_HEADER)
-        # A~I, L: 위 행(r-1)과 병합
-        for c in (1, 2, 3, 4, 5, 6, 7, 8, 9, 12):
+        # A~I, L, M: 위 행(r-1)과 병합
+        for c in (1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13):
             ws.merge_cells(start_row=r - 1, start_column=c, end_row=r, end_column=c)
         r += 1
 
         # 데이터 행
         for col in table.columns:
             ws.row_dimensions[r].height = S.ROW_HEIGHT_DEFAULT
-            font = S.FONT_PK if col.is_pk else S.FONT_NORMAL
 
-            null_str  = "NN" if col.not_null else ""   # NOT NULL → NN, nullable → 빈칸
-            keys_str  = "PK" if col.is_pk else ("UK" if col.is_uk else "")
+            # G열 Keys: PK / UK / FK 복합 표시
+            keys_parts = []
+            if col.is_pk:
+                keys_parts.append("PK")
+            if col.is_uk:
+                keys_parts.append("UK")
+            if col.fk_info:
+                keys_parts.append("FK")
+            keys_str = ",".join(keys_parts)
+
+            # 기본 폰트: PK 행은 bold
+            base_font = S.FONT_PK if col.is_pk else S.FONT_NORMAL
+
+            null_str  = "NN" if col.not_null else ""
             attr_type = ""
             rel_val   = ""
             src_val   = ""
@@ -327,21 +377,33 @@ class ExcelWriter:
                 rel_val   = f'IND_CD="{code_group}"'
                 src_val   = str(code_vals)
 
+            # M열: AI 추론 attribute_name이 있는 경우 COMMENT SQL 생성
+            comment_sql = ""
+            if col.attribute_name_ai:
+                comment_sql = (
+                    f"COMMENT ON COLUMN {table.name}.{col.name} "
+                    f"IS '{col.attribute_name}';"
+                )
+
+            # C열 / M열 폰트: AI 추론값이면 주황색
+            attr_font = S.FONT_AI_SUGGESTED if col.attribute_name_ai else base_font
+
             row_data = [
-                (1,  col.no,              S.ALIGN_CENTER),
-                (2,  col.name,            S.ALIGN_LEFT_NO_WRAP),
-                (3,  col.attribute_name,  S.ALIGN_LEFT_NO_WRAP),
-                (4,  col.type_str,        S.ALIGN_CENTER),
-                (5,  col.length,          S.ALIGN_CENTER),
-                (6,  null_str,            S.ALIGN_CENTER),
-                (7,  keys_str,            S.ALIGN_CENTER),
-                (8,  "",                  S.ALIGN_LEFT_NO_WRAP),  # 인포타입명 (미지원)
-                (9,  "",                  S.ALIGN_LEFT_NO_WRAP),  # Description (미사용)
-                (10, attr_type,           S.ALIGN_CENTER),
-                (11, rel_val,             S.ALIGN_LEFT_NO_WRAP),
-                (12, src_val,             S.ALIGN_LEFT_NO_WRAP),  # Source (코드그룹 값 목록)
+                (1,  col.no,              S.ALIGN_CENTER,       base_font),
+                (2,  col.name,            S.ALIGN_LEFT_NO_WRAP, base_font),
+                (3,  col.attribute_name,  S.ALIGN_LEFT_NO_WRAP, attr_font),
+                (4,  col.type_str,        S.ALIGN_CENTER,       base_font),
+                (5,  col.length,          S.ALIGN_CENTER,       base_font),
+                (6,  null_str,            S.ALIGN_CENTER,       base_font),
+                (7,  keys_str,            S.ALIGN_CENTER,       base_font),
+                (8,  "",                  S.ALIGN_LEFT_NO_WRAP, base_font),
+                (9,  "",                  S.ALIGN_LEFT_NO_WRAP, base_font),
+                (10, attr_type,           S.ALIGN_CENTER,       base_font),
+                (11, rel_val,             S.ALIGN_LEFT_NO_WRAP, base_font),
+                (12, src_val,             S.ALIGN_LEFT_NO_WRAP, base_font),
+                (13, comment_sql,         S.ALIGN_LEFT_NO_WRAP, S.FONT_AI_SUGGESTED if comment_sql else base_font),
             ]
-            for c_idx, val, align in row_data:
+            for c_idx, val, align, font in row_data:
                 self._wc(ws, r, c_idx, val, font=font, align=align)
             r += 1
 

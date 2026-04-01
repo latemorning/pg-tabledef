@@ -243,6 +243,60 @@ def _parse_constraint(con: Constraint) -> dict | None:
     }
 
 
+def _split_sql_statements(sql_text: str) -> list[str]:
+    """SQL 텍스트를 세미콜론 기준으로 분리. 문자열 리터럴·주석 내부의 세미콜론 무시."""
+    statements: list[str] = []
+    current: list[str] = []
+    i = 0
+    in_single_quote = False
+    in_line_comment = False
+    in_block_comment = False
+
+    while i < len(sql_text):
+        ch = sql_text[i]
+        if in_line_comment:
+            current.append(ch)
+            if ch == "\n":
+                in_line_comment = False
+        elif in_block_comment:
+            current.append(ch)
+            if ch == "*" and i + 1 < len(sql_text) and sql_text[i + 1] == "/":
+                i += 1
+                current.append(sql_text[i])
+                in_block_comment = False
+        elif in_single_quote:
+            current.append(ch)
+            if ch == "'":
+                if i + 1 < len(sql_text) and sql_text[i + 1] == "'":
+                    i += 1
+                    current.append(sql_text[i])  # escaped ''
+                else:
+                    in_single_quote = False
+        else:
+            if ch == "'":
+                in_single_quote = True
+                current.append(ch)
+            elif ch == "-" and i + 1 < len(sql_text) and sql_text[i + 1] == "-":
+                in_line_comment = True
+                current.append(ch)
+            elif ch == "/" and i + 1 < len(sql_text) and sql_text[i + 1] == "*":
+                in_block_comment = True
+                current.append(ch)
+            elif ch == ";":
+                stmt = "".join(current).strip()
+                if stmt:
+                    statements.append(stmt + ";")
+                current = []
+            else:
+                current.append(ch)
+        i += 1
+
+    tail = "".join(current).strip()
+    if tail:
+        statements.append(tail)
+    return statements
+
+
 def parse_files(input_dir: str | Path = "input") -> list[TableDef]:
     """input_dir 의 .sql 파일을 파싱하여 알파벳 순 정렬된 list[TableDef]를 반환."""
     input_path = Path(input_dir)
@@ -264,8 +318,19 @@ def parse_files(input_dir: str | Path = "input") -> list[TableDef]:
         try:
             parsed = pglast.parse_sql(sql_text)
         except Exception as e:
-            print(f"[WARN] Failed to parse {sql_file.name}: {e}")
-            continue
+            print(f"[WARN] {sql_file.name} 전체 파싱 실패 ({e}) — 문장별 재시도")
+            all_stmts: list = []
+            skipped = 0
+            for stmt_text in _split_sql_statements(sql_text):
+                try:
+                    result = pglast.parse_sql(stmt_text)
+                    if result:
+                        all_stmts.extend(result)
+                except Exception:
+                    skipped += 1
+            if skipped:
+                print(f"[WARN] {skipped}개 문장 스킵 (invalid SQL)")
+            parsed = all_stmts if all_stmts else None
 
         if parsed is None:
             continue
@@ -438,6 +503,29 @@ def _extract_comment_table_name(obj_node) -> str | None:
             if isinstance(last, String):
                 return last.sval
     return None
+
+
+def filter_excluded(tables: list) -> list:
+    """rules/exclude_tables.txt 에 등록된 테이블을 제외하고 반환.
+
+    파일이 없으면 원본 반환. # 주석 및 빈 줄 무시. 대소문자 구분 없이 비교.
+    """
+    rules_path = Path(__file__).parent.parent / "rules" / "exclude_tables.txt"
+    if not rules_path.exists():
+        return tables
+
+    excluded: set[str] = set()
+    for line in rules_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            excluded.add(line.lower())
+
+    before = len(tables)
+    result = [t for t in tables if t.name.lower() not in excluded]
+    removed = before - len(result)
+    if removed:
+        print(f"[INFO] 제외: {removed}개 테이블 (exclude_tables.txt)")
+    return result
 
 
 def _extract_comment_column_name(obj_node) -> tuple[str | None, str | None]:
