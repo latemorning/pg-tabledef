@@ -3,7 +3,7 @@
 레이아웃 구조 (테이블 1개 기준):
   Row +1 : Table 명 / TableSpace / Sub System / 주제영역명 / 주제영역명약어
   Row +2 : Entity 명 / 최초작성일 / 최종수정일 / 엔티티분류 / 오너쉽
-  Row +3 : Entity 정의 (높이 120, B:L 병합)
+  Row +3 : Entity 정의 (높이 160, B:L 병합)
   Row +4 : Key List 헤더 (높이 40)
   Row +5 : Primary Key
   Row +6 : Foreign Key
@@ -178,10 +178,11 @@ class ExcelWriter:
         self._wc(ws, r, 12, "",                    align=S.ALIGN_CENTER)
         r += 1
 
-        # Row 3: Entity 정의 | [B:L 병합 빈칸] (높이 120)
+        # Row 3: Entity 정의 | [B:L 병합] (높이 120)
+        def_font = S.FONT_AI_SUGGESTED if table.entity_definition_ai else None
         ws.row_dimensions[r].height = S.ROW_HEIGHT_ENTITY_DEF
-        self._wc(ws, r, 1, "Entity 정의", align=S.ALIGN_CENTER, fill=S.FILL_HEADER)
-        self._wc(ws, r, 2, "",             align=S.ALIGN_LEFT)
+        self._wc(ws, r, 1, "Entity 정의",          align=S.ALIGN_CENTER, fill=S.FILL_HEADER)
+        self._wc(ws, r, 2, table.entity_definition, align=S.ALIGN_LEFT,   font=def_font)
         ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=12)
         r += 1
 
@@ -358,21 +359,23 @@ class ExcelWriter:
             attr_type = ""
             rel_val   = ""
             src_val   = ""
+            # J/K/L 출력 우선순위: FK > column_attribute_rules > dtl_code B열 > dtl_code C열
             if col.fk_info:
+                # 1순위: FK → J=RELATION, K=ref_table.ref_col
                 attr_type = "RELATION"
                 ref_cols  = ", ".join(col.fk_info.ref_columns) if col.fk_info.ref_columns else ""
                 rel_val   = f"{col.fk_info.ref_table}.{ref_cols}" if ref_cols else col.fk_info.ref_table
-            rule = _COLUMN_RULES.get((col.name, col.attribute_name))
-            if rule:
+            elif rule := _COLUMN_RULES.get((col.name, col.attribute_name)):
+                # 2순위: column_attribute_rules.json 매칭
                 attr_type, rel_val = rule
-            # dtl_code.csv: B열(col.name) 매칭
-            if col.name in _DTL_BY_NAME:
+            elif col.name in _DTL_BY_NAME:
+                # 3순위: dtl_code.csv B열(col.name) 매칭
                 code_vals = _DTL_BY_NAME[col.name]
                 attr_type = "코드 그룹"
                 rel_val   = f'IND_CD="{col.name}"'
                 src_val   = str(code_vals)
-            # dtl_code.csv: C열(col.attribute_name) 매칭
             elif col.attribute_name and col.attribute_name in _DTL_BY_ATTR:
+                # 4순위: dtl_code.csv C열(col.attribute_name) 매칭
                 code_group, code_vals = _DTL_BY_ATTR[col.attribute_name]
                 attr_type = "코드 그룹"
                 rel_val   = f'IND_CD="{code_group}"'

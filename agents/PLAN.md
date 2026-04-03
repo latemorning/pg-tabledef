@@ -16,17 +16,6 @@
 
 ---
 
-## 참고 양식
-
-실제 엑셀 테이블 정의서 양식 (`data/IMG_9919.HEIC`) 분석 결과:
-
-**구성 섹션:**
-1. 테이블 정보 헤더 (상단)
-2. Key List (중단)
-3. 컬럼 목록 (하단)
-
----
-
 ## 추출 항목
 
 ### DDL 파일에서 추출 가능
@@ -64,24 +53,22 @@
 | Relation & Value | FK 참조 테이블.컬럼 또는 코드그룹 조건 | FK: `ref_table.ref_col` / 코드그룹: `IND_CD="컬럼명"` |
 | Source | 코드 값 목록 | 코드그룹일 때 `["APLY", "TRMN"]` 형식, 나머지 빈칸 |
 
-### DDL 파일에서 추출 불가 (빈칸 출력)
+### DDL 파일에서 추출 불가 (빈칸 또는 규칙 기반 출력)
 
 | 엑셀 항목 | 위치 | 비고 |
 |----------|------|------|
-| TableSpace | Row1 C | 미지원 (빈칸) |
-| Sub System | Row1 F:G | 미지원 (빈칸) |
-| 주제영역명 | Row1 I | 미지원 (빈칸) |
-| 주제영역명약어 | Row1 K | 미지원 (빈칸) |
-| 최초작성일 | Row2 C | 미지원 (빈칸) |
-| 최종수정일 | Row2 F:G | 미지원 (빈칸) |
-| 엔티티분류 | Row2 I | 미지원 (빈칸) |
-| 오너쉽 | Row2 K | 미지원 (빈칸) |
-| Entity 정의 | Row3 B:L | 미지원 (빈칸) |
-| 인포타입명 | H열 | 미지원 (빈칸) |
+| TableSpace | Row1 C | 빈칸 |
+| Sub System | Row1 H | table_subject_rules.json 패턴 매칭 |
+| 주제영역명 | Row1 J | table_subject_rules.json 패턴 매칭 |
+| 주제영역명약어 | Row1 L | table_subject_rules.json 패턴 매칭 |
+| 최초작성일 | Row2 C | 빈칸 |
+| 최종수정일 | Row2 F:G | 빈칸 |
+| 엔티티분류 | Row2 J | entity_class_rules.json 또는 AI 추론 |
+| 오너쉽 | Row2 K | 빈칸 |
+| Entity 정의 | Row3 B:L | entity_definition_rules.json 또는 AI 추론. 없으면 빈칸 |
+| 인포타입명 | H열 | 빈칸 |
 | Attribute Type | J열 | FK → `RELATION`, 코드그룹 → `코드 그룹`, rules.json 매칭 → 고정값, 나머지 빈칸 |
 | Source | L열 | 코드그룹 매칭 시 코드값 목록 (`["APLY", "TRMN"]` 형식), 나머지 빈칸 |
-
-이후 항목 추가 가능한 확장 구조로 설계.
 
 ---
 
@@ -106,12 +93,14 @@ pg-tabledef/
 │   ├── PLAN.md              ← 이 파일 (설계 담당)
 │   ├── IMPLEMENT.md         ← 구현 담당 에이전트 가이드
 │   └── TEST.md              ← 테스트 담당 에이전트 가이드
-├── data/
-│   └── IMG_9919.HEIC        ← 참고 양식 이미지
-├── rules/                   ← J/K/L열 출력 규칙 파일
+├── rules/                   ← 엑셀 출력 규칙 파일
 │   ├── column_attribute_rules.json  ← (column_name, attribute_name) → (attr_type, rel_val)
-│   ├── dtl_code.csv         ← 코드그룹 정의 (코드그룹,설명,그룹접두사,코드값,코드명칭)
-│   └── exclude_tables.txt   ← 출력에서 제외할 테이블명 목록 (줄당 1개)
+│   ├── dtl_code.csv                 ← 코드그룹 정의 (코드그룹,설명,그룹접두사,코드값,코드명칭)
+│   ├── entity_class_rules.json      ← 테이블명 → KEY/MAIN/ACTION (AI 추론값 캐시)
+│   ├── entity_definition_rules.json ← 테이블명 → Entity 정의 텍스트 (AI 추론값 캐시)
+│   ├── inferred_fk_rules.json       ← 테이블명 → FK 관계 추론 (AI 추론값 캐시 + 수동 정의)
+│   ├── table_subject_rules.json     ← 테이블명 패턴 → Sub System/주제영역명/약어
+│   └── exclude_tables.txt           ← 출력에서 제외할 테이블명 목록 (줄당 1개)
 ├── input/                   ← IntelliJ SQL Generator로 추출한 DDL 파일
 ├── output/                  ← 생성된 엑셀 파일
 ├── requirements.txt
@@ -120,7 +109,7 @@ pg-tabledef/
 │   ├── __init__.py
 │   ├── models.py
 │   ├── parser.py
-│   ├── enricher.py              ← AI 추론으로 빈 코멘트 보완
+│   ├── enricher.py              ← AI 추론 보완 (comment / attribute_name / entity_class / entity_definition / inferred_fk)
 │   └── writer/
 │       ├── __init__.py
 │       ├── styles.py
@@ -139,9 +128,10 @@ pg-tabledef/
 | 파일 | 역할 |
 |------|------|
 | `models.py` | 순수 데이터 클래스 (TableDef, ColumnDef, IndexDef, FKInfo) |
-| `parser.py` | pglast로 `.sql` 파일 파싱 → models 조립 (ddl-diff mapper.py 참고) |
+| `parser.py` | pglast로 `.sql` 파일 파싱 → models 조립, filter_excluded() |
+| `enricher.py` | AI 추론 보완 (comment / attribute_name / entity_class / entity_definition / inferred_fk) |
 | `writer/styles.py` | openpyxl 스타일 상수 |
-| `writer/excel.py` | 엑셀 출력 |
+| `writer/excel.py` | 엑셀 출력, _resolve_subject() 주제영역 매핑 |
 | `main.py` | CLI 진입점 |
 
 > ddl-diff `/Users/harry/projects/ddl-diff/ddl_diff/mapper.py` — 타입 변환·제약조건 파싱 로직 참고
@@ -153,8 +143,8 @@ pg-tabledef/
 | 항목 | 경로 | 비고 |
 |------|------|------|
 | 입력 | `./input/` | 스키마 파일을 수동으로 올려두는 폴더 |
-| 출력 | `./output/` | 엑셀 파일 저장 폴더 |
-| 출력 파일명 | `테이블정의서.xlsx` | 고정 (덮어쓰기) |
+| 출력 | `./output/` | 파일 저장 폴더 |
+| 출력 파일명 | `테이블정의서.xlsx` | 엑셀 정의서 (고정, 덮어쓰기) |
 | 제외 목록 | `./rules/exclude_tables.txt` | 없으면 전체 출력 |
 
 ## 제외 테이블 (`rules/exclude_tables.txt`)
@@ -255,7 +245,7 @@ ddl-diff의 `_TYPE_MAP` + `_extract_type_str` 로직 재사용.
 ```
 Row 1: [A1]Table 명 | [B1]{table_name} | [C1]TableSpace | [D1:E1]   | [F1:G1]Sub System | [H1]   | [I1]주제영역명 | [J1]  | [K1]주제영역명약어 | [L1]
 Row 2: [A2]Entity 명| [B2]{comment}    | [C2]최초작성일  | [D2:E2]   | [F2:G2]최종수정일  | [H2]   | [I2]엔티티분류  | [J2]  | [K2]오너쉽        | [L2]
-Row 3: [A3]Entity 정의 | [B3:L3]                                                    (빈칸, 높이 120)
+Row 3: [A3]Entity 정의 | [B3:L3] Entity 정의 텍스트 (높이 160)
 ```
 
 - `{table_name}`: 테이블명
@@ -388,7 +378,7 @@ Row 3: [A3]Entity 정의 | [B3:L3]                                              
 |----|------|------|
 | Row 1 | 테이블 정보 Row 1 | 20 |
 | Row 2 | 테이블 정보 Row 2 | 20 |
-| Row 3 | Entity 정의 | 120 |
+| Row 3 | Entity 정의 | 160 |
 | Row 4 | Key List 헤더 | 40 |
 | Row 5~11 | Key List 데이터 | 20 |
 | Row 12~13 | 컬럼 헤더 | 20 |
@@ -398,7 +388,7 @@ Row 3: [A3]Entity 정의 | [B3:L3]                                              
 
 ## 타입 표시 포맷 (약식 표기 규칙)
 
-이미지(`data/IMG_9920.HEIC`) 기준 약식 표기. DDL 타입명 → 엑셀 표시값:
+DDL 타입명 → 엑셀 표시값:
 
 | 분류 | DDL 타입명 | 엑셀 표시 | 비고 |
 |------|-----------|----------|------|
@@ -426,6 +416,62 @@ Row 3: [A3]Entity 정의 | [B3:L3]                                              
 > 길이는 `ColumnDef.length` 필드에 별도 저장 — Type 열에는 약식(`VC`, `DEC`)만, Length 열에 숫자만 출력
 
 ---
+
+## Entity 정의 (`rules/entity_definition_rules.json`)
+
+### 개요
+
+테이블 헤더 Row 3 B:L 병합 셀에 Entity 정의 텍스트 출력.
+
+**형식 (3개 섹션 고정, 테이블명 없이 1.부터 시작):**
+```
+ 1.집합적 의미
+• ...
+ 2.기능적 의미
+• ...
+ 3.자료발생 규칙
+• ...
+```
+
+### 규칙 파일 (`rules/entity_definition_rules.json`)
+
+```json
+{
+  "테이블명_소문자": " 1.집합적 의미\n• ...\n 2.기능적 의미\n• ...\n 3.자료발생 규칙\n• ..."
+}
+```
+
+### 처리 흐름 (`enrich_entity_definition()` in `enricher.py`)
+
+1. `rules/entity_definition_rules.json` 로드
+2. 각 테이블명(소문자)을 JSON에서 조회
+   - 있으면: `entity_definition` 설정, `entity_definition_ai = False`
+   - 없으면: AI 추론 대상 목록에 추가
+3. AI 추론 (`ANTHROPIC_API_KEY` 없으면 스킵)
+   - 샘플 예제 few-shot + 테이블명/설명/엔티티분류/컬럼 목록 제공
+   - 3개 섹션 형식으로 출력
+   - `entity_definition_ai = True` 플래그 설정
+4. 새 AI 추론값을 JSON 파일에 저장
+
+### models.py 추가 필드
+
+```python
+entity_definition: str = ""         # Entity 정의 텍스트 (Row3 B:L)
+entity_definition_ai: bool = False  # True이면 AI가 추론한 값
+```
+
+### excel.py 적용
+
+- Row 3 B:L 병합 셀: `table.entity_definition` 출력 (`ALIGN_LEFT`, wrap_text)
+- `entity_definition_ai is True`이면 **주황색 글씨** (`FONT_AI_SUGGESTED`)
+
+### main.py 호출 순서
+
+```python
+tables = enrich(tables)
+tables = enrich_entity_class(tables)
+tables = enrich_entity_definition(tables)
+```
 
 ---
 
@@ -477,13 +523,6 @@ entity_class_ai: bool = False  # True이면 AI가 추론한 값
 - Row 2 J열(col 10): `table.entity_class` 출력
 - `entity_class_ai is True`이면 **주황색 글씨** (`FONT_AI_SUGGESTED`)
 
-### main.py 호출 순서
-
-```python
-tables = enrich(tables)          # 빈 코멘트/attribute_name AI 보완
-tables = enrich_entity_class(tables)  # 엔티티분류 결정
-```
-
 ---
 
 ## 테이블 주제영역 매핑 (`rules/table_subject_rules.json`)
@@ -528,63 +567,107 @@ tables = enrich_entity_class(tables)  # 엔티티분류 결정
 
 ---
 
-## AI 추론 보완 (enricher.py)
+## AI 추론 보완 요약
 
-### 개요
+모든 AI 추론은 `enricher.py`에서 처리. `ANTHROPIC_API_KEY` 없으면 경고 후 스킵.
+추론된 값은 **주황색 글씨** (`FONT_AI_SUGGESTED`, `#CC5500`)로 출력.
+AI 추론값은 각 JSON 파일에 캐시 저장 (이후 실행 시 API 호출 없이 재사용).
 
-파싱 후 엑셀 출력 전, 빈 Entity 명 / ATTRIBUTE NAME 을 Claude API로 자동 추론.
-추론된 값은 엑셀에서 **주황색 글씨** (`#CC5500`, Claude 아이콘 계열)로 출력.
+| enricher 함수 | 대상 | 캐시 파일 |
+|--------------|------|---------|
+| `enrich()` | `table.comment`, `col.attribute_name` | 없음 (매번 추론) |
+| `enrich_entity_class()` | `table.entity_class` | `entity_class_rules.json` |
+| `enrich_entity_definition()` | `table.entity_definition` | `entity_definition_rules.json` |
+| `enrich_inferred_fk()` | `table.inferred_fk_list` | `inferred_fk_rules.json` |
 
-### 대상 필드
+## FK 관계 추론 (`rules/inferred_fk_rules.json`)
 
-| 조건 | 대상 |
-|------|------|
-| `table.comment == ""` | A열 Entity 명 |
-| `col.attribute_name == ""` | C열 ATTRIBUTE NAME |
+DDL에 FK 제약조건이 없는 경우 테이블 간 관계를 추론하여 `TableDef.inferred_fk_list`에 저장.
+ERD 생성 등 후속 처리에서 사용.
 
-### models.py 추가 플래그
+### 처리 순서
+
+1. **JSON 캐시 우선**: `rules/inferred_fk_rules.json` 에 있으면 그 값 사용 (null이면 "관계 없음" 확정)
+2. **컬럼명 자동 매칭**: A 테이블 단일 PK 컬럼명 == B 테이블 일반 컬럼명 → B→A 관계 추론 (`source="auto"`)
+3. **AI 추론**: 접미사(`_id`, `_cd`, `_no`, `_seq`, `_key`, `_code`)로 끝나는 나머지 컬럼을 AI가 추론 후 JSON 저장 (`source="ai"`)
+
+### 모델
 
 ```python
 @dataclass
-class TableDef:
-    ...
-    comment_ai: bool = False   # True이면 AI가 추론한 comment
-
-@dataclass
-class ColumnDef:
-    ...
-    attribute_name_ai: bool = False  # True이면 AI가 추론한 attribute_name
+class InferredFKInfo:
+    column: str       # 로컬 컬럼명
+    ref_table: str    # 참조 테이블명
+    ref_column: str   # 참조 컬럼명
+    source: str = ""  # "auto" | "ai"
 ```
 
-### enricher.py 처리 흐름
+`TableDef.inferred_fk_list: list[InferredFKInfo]` — 실제 FK(`fk_list`)와 분리하여 저장.
 
+### JSON 캐시 형식
+
+```json
+{
+  "_exclude": {
+    "columns": ["rgst_user_id", "mdfy_user_id"],
+    "ref_tables": ["adm_cmn_cd_d", "adm_cmn_cd_m"],
+    "table_prefixes": ["EX_"]
+  },
+  "테이블명_소문자": {
+    "컬럼명": {"ref_table": "참조테이블명", "ref_column": "참조컬럼명"},
+    "컬럼명2": null
+  }
+}
+```
+
+- null 값: AI가 관계 없다고 판단 → 이후 재추론 스킵
+- `_exclude.columns`: 추론 대상에서 제외할 컬럼명 (예: 등록자/수정자 공통 컬럼)
+- `_exclude.ref_tables`: 참조 대상에서 제외할 테이블명
+- `_exclude.table_prefixes`: 해당 접두어 테이블은 소스/참조 모두 제외 (예: EX_ 복사본 테이블)
+
+**main.py 호출 순서:**
 ```python
-def enrich(tables: list[TableDef]) -> list[TableDef]:
-    """빈 comment / attribute_name을 Claude API로 보완."""
+tables = filter_excluded(tables)
+tables = enrich(tables)
+tables = enrich_entity_class(tables)
+tables = enrich_entity_definition(tables)
+tables = enrich_inferred_fk(tables)
 ```
 
-1. **테이블 단위 배치**: 테이블 1개당 API 호출 1회
-   - 입력: 테이블명, 기존 컬럼명 + attribute_name 목록 (컨텍스트)
-   - 요청 항목: 빈 comment(테이블) + 빈 attribute_name(컬럼) 목록
-2. **제약 조건**: 한두 단어, 최대 10자, 한글
-3. **응답 파싱**: JSON 형식으로 반환 요청 (`{"table_comment": "...", "columns": {"col_name": "..."}}`
-4. **플래그 설정**: 추론된 값은 `comment_ai = True` / `attribute_name_ai = True`
-5. **API 키**: `ANTHROPIC_API_KEY` 환경변수. 없으면 경고 출력 후 AI 보완 건너뜀
-6. **모델**: `claude-haiku-4-5-20251001` (속도/비용 최적)
+---
 
-### styles.py 추가 상수
+## ERD 출력 (`output/erd*.md`)
 
-```python
-FONT_AI_SUGGESTED = Font(size=10, color="CC5500")  # Claude 주황색, AI 추론값용
-```
+`python main.py` 실행 시 엑셀과 함께 자동 생성.
+Mermaid `erDiagram` 블록을 포함한 마크다운 — GitHub / Notion / VS Code에서 바로 렌더링.
 
-### excel.py 적용
+### 출력 파일
 
-- `table.comment_ai is True` → Entity 명 셀에 `FONT_AI_SUGGESTED` 적용
-- `col.attribute_name_ai is True` → ATTRIBUTE NAME 셀(C열)에 `FONT_AI_SUGGESTED` 적용
-- `col.attribute_name_ai is True` → M열에 PostgreSQL COMMENT 스크립트 출력 (주황색)
-  - 형식: `COMMENT ON COLUMN {table.name}.{col.name} IS '{col.attribute_name}';`
-  - `attribute_name_ai is False`인 행의 M열: 빈칸
+| 파일 | 내용 | 목적 |
+|------|------|------|
+| `output/erd.md` | 전체 테이블 — 엔티티 레이블만, 관계 라인 | 전체 구조 개요 |
+| `output/erd_{abbr}.md` | 주제영역별 — 컬럼 상세 포함, 외부 참조 테이블 stub | 영역별 상세 확인 |
+
+- `abbr`: `table_subject_rules.json`의 `subject_area_abbr` (예: ONM, PHUB, ST …)
+- 주제영역 미분류 테이블: `erd_기타.md`
+
+### Mermaid 텍스트 크기 제한 대응
+
+모든 파일 첫 줄에 `%%{init: {'maxTextSize': 200000}}%%` 추가.
+전체 ERD는 컬럼 상세를 생략하여 텍스트 크기 최소화.
+
+### 관계 표시
+
+| 구분 | 표기 | 소스 |
+|------|------|------|
+| 실제 FK | `\|\|--o{` (실선) | DDL `ALTER TABLE ... FOREIGN KEY` |
+| 추론 FK | `\|\|..o{` (점선) | `inferred_fk_list` (자동 매칭 + AI 추론) |
+
+### 엔티티 레이블
+
+`table_name["논리명 (물리명)"]` 형식으로 한 줄 표시.
+코멘트가 없으면 물리명만 표시.
+주제영역별 파일의 외부 참조 테이블은 레이블만 출력 (컬럼 생략).
 
 ---
 

@@ -1,0 +1,320 @@
+{
+  "adm_accs_ctrl_m": {
+    "rltn_corp_id": null,
+    "athn_key": null
+  },
+  "adm_action_chng_hist": {
+    "mot_id": null
+  },
+  "adm_api_if_log": {
+    "pg_deal_no": null,
+    "rply_cd": null
+  },
+  "adm_batch_log": {
+    "task_id": null,
+    "rslt_code": null
+  },
+  "adm_cmn_cd_m": {
+    "grp_cd": null
+  },
+  "adm_logcntr_log": {
+    "actn_id": {
+      "ref_table": "adm_action_info",
+      "ref_column": "uri"
+    }
+  },
+  "adm_menu_info": {
+    "upr_menu_id": {
+      "ref_table": "adm_menu_info",
+      "ref_column": "menu_id"
+    }
+  },
+  "adm_msg_info": {
+    "msg_cd": null
+  },
+  "adm_pnt_prvdr_msg": {
+    "pnt_cd": {
+      "ref_table": "cl_cmpr_point",
+      "ref_column": "pnt_cd"
+    }
+  },
+  "adm_prmt_chng_hist": {
+    "prmt_grp_cd": null
+  },
+  "adm_sysprmt_info": {
+    "prmt_grp_cd": null
+  },
+  "adm_user_info": {
+    "stat_cd": null,
+    "user_grp_id": {
+      "ref_table": "adm_menu_by_auth",
+      "ref_column": "user_grp_id"
+    }
+  },
+  "adm_user_info_hist": {
+    "stat_cd": null,
+    "user_grp_id": {
+      "ref_table": "adm_menu_by_auth",
+      "ref_column": "user_grp_id"
+    },
+    "dept_cd": null,
+    "chng_user_id": {
+      "ref_table": "adm_user_info",
+      "ref_column": "user_id"
+    }
+  },
+  "adm_user_log": {
+    "actn_id": null
+  },
+  "auto_drmt_customer_hist": {
+    "drmt_id": null
+  },
+  "cl_cmpr_fail": {
+    "pnt_cd": {
+      "ref_table": "cl_cmpr_point",
+      "ref_column": "pnt_cd"
+    },
+    "pnt_tr_no": null,
+    "ori_pnt_tr_no": null,
+    "err_cd": {
+      "ref_table": "st_if_err_info",
+      "ref_column": "err_cd"
+    }
+  },
+  "cl_cmpr_file_info": {
+    "pt_hb_bne_cd": null
+  },
+  "cl_cmpr_sucs": {
+    "pnt_cd": {
+      "ref_table": "cl_cmpr_point",
+      "ref_column": "pnt_cd"
+    },
+    "pnt_tr_no": null,
+    "ori_pnt_tr_no": null
+  },
+  "drmt_customer_hist": {
+    "drmt_id": null
+  },
+  "fp_cpn_use_cmpr_fail": {
+    "err_cd": null
+  },
+  "fp_gifti_show_goods": {
+    "splcom_cd": null,
+    "use_com_code": null,
+    "valid_prd_type_cd": null,
+    "supply_uniq_cd": null,
+    "brand_cd": null
+  },
+  "fp_gifti_show_goods_tmp": {
+    "splcom_cd": null,
+    "use_com_code": null,
+    "valid_prd_type_cd": null,
+    "supply_uniq_cd": null,
+    "brand_cd": null
+  },
+  "fp_gifti_show_info": {
+    "ctr_id": null,
+    "goods_id": {
+      "ref_table": "fp_gifti_show_goods",
+      "ref_column": "goods_cd"
+    },
+    "pay_no": null
+  },
+  "fp_rds_cmpr_file_info": {
+    "cpn_stat_cd": null
+  },
+  "pg_cmpr_info_d": {
+    "pg_deal_no": null
+  },
+  "ph_cls_info": {
+    "service_id": null,
+    "cls_grp_id": null
+  },
+  "ph_cpn_chng_hist": {
+    "chng_typ_cd": null,
+    "cpn_typ_id": null,
+    "cpn_stat_cd": null,
+    "prnt_phub_cpn_no": {
+      "ref_table": "ph_cpn_isue_info",
+      "ref_column": "phub_cpn_no"
+    },
+    "cncl_phub_tr_no": {
+      "ref_table": "ph_deal_info",
+      "ref_column": "phub_tr_no"
+    },
+    "cust_type_cd": null
+  },
+  "ph_cpn_isue_info": {
+    "cpn_typ_id": null,
+    "kos_tr_no": null,
+    "cpn_stat_cd": null,
+    "prnt_phub_cpn_no": {
+      "ref_table": "ph_cpn_isue_info",
+      "ref_column": "phub_cpn_no"
+    },
+    "cncl_phub_tr_no": {
+      "ref_table": "ph_deal_info",
+      "ref_column": "phub_tr_no"
+    },
+    "cust_type_cd": null
+  },
+  "ph_deal_dtl": {
+    "pnt_cd": {
+      "ref_table": "ph_pnt_prvdr",
+      "ref_column": "prvdr_id"
+    },
+    "ori_pnt_tr_no": {
+      "ref_table": "ph_deal_dtl",
+      "ref_column": "pnt_tr_no"
+    },
+    "naver_masking_id": null,
+    "naver_user_key": null
+  },
+  "ph_deal_info": {
+    "pg_send_po_id": null,
+    "pg_deal_no": null,
+    "ori_phub_tr_no": {
+      "ref_table": "ph_deal_info",
+      "ref_column": "phub_tr_no"
+    },
+    "ori_pg_deal_no": null,
+    "service_id": null
+  },
+  "ph_deal_req_dtl": {
+    "pnt_cd": {
+      "ref_table": "ph_pnt_prvdr",
+      "ref_column": "pnt_cd"
+    },
+    "ori_pnt_tr_no": null,
+    "err_cd": null,
+    "naver_masking_id": null,
+    "naver_user_key": null
+  },
+  "ph_deal_req_info": {
+    "pg_deal_no": null,
+    "pg_send_po_id": null,
+    "ori_phub_tr_no": {
+      "ref_table": "ph_deal_info",
+      "ref_column": "phub_tr_no"
+    },
+    "ori_pg_deal_no": null,
+    "err_cd": null,
+    "service_id": null
+  },
+  "ph_info_prvd_item": {
+    "rcvr_id": null
+  },
+  "ph_mon_sttl_d": {
+    "pnt_id": {
+      "ref_table": "ph_pnt_prvdr",
+      "ref_column": "prvdr_id"
+    }
+  },
+  "ph_pg_cmpn_info": {
+    "athn_key": null
+  },
+  "ph_pg_cprt": {
+    "pg_send_po_id": null
+  },
+  "ph_pg_cprt_limit_hist": {
+    "cprt_cmpn_seq": {
+      "ref_table": "ph_pg_cprt_limit_info",
+      "ref_column": "cprt_cmpn_seq"
+    },
+    "ori_phub_tr_no": {
+      "ref_table": "ph_deal_info",
+      "ref_column": "phub_tr_no"
+    }
+  },
+  "ph_pnt_cmpn_info": {
+    "biz_no": null,
+    "lotte_aflt_no": null,
+    "kmc_url_id": null,
+    "cls_grp_id": null
+  },
+  "ph_pnt_cmpn_user": {
+    "pnt_cmpn_user_id": null
+  },
+  "ph_pnt_cust_ctn": {
+    "cell_mdl_cd": null
+  },
+  "ph_pnt_cust_info": {
+    "clip_cust_id": null
+  },
+  "ph_pnt_prvdr": {
+    "pnt_cd": {
+      "ref_table": "ph_pnt_acml_use",
+      "ref_column": "pnt_cd"
+    },
+    "athn_key": null
+  },
+  "rwrd_goods_prepay_req_hist": {
+    "cprt_goods_id": {
+      "ref_table": "rwrd_goods_rgst_info",
+      "ref_column": "cprt_goods_id"
+    }
+  },
+  "rwrd_goods_rgst_info": {
+    "engg_stat_cd": null,
+    "bill_user_key": {
+      "ref_table": "auto_pay_err_hist",
+      "ref_column": "bill_user_key"
+    }
+  },
+  "st_deal_dtl": {
+    "pnt_cd": {
+      "ref_table": "ph_pnt_prvdr",
+      "ref_column": "prvdr_id"
+    }
+  },
+  "st_deal_info_by_gender": {
+    "service_id": {
+      "ref_table": "st_deal_info",
+      "ref_column": "service_id"
+    }
+  },
+  "_exclude": {
+    "columns": [
+      "rgst_user_id",
+      "mdfy_user_id"
+    ],
+    "ref_tables": [
+      "adm_cmn_cd_d",
+      "adm_cmn_cd_m"
+    ],
+    "table_prefixes": [
+      "EX_"
+    ]
+  },
+  "adm_batch_dtl": {
+    "rslt_code": null
+  },
+  "adm_batch_log_m": {
+    "rslt_code": null
+  },
+  "auto_pay_err_hist": {
+    "err_cd": {
+      "ref_table": "st_pay_err_by_cprt",
+      "ref_column": "err_cd"
+    }
+  },
+  "fp_fmly_supot": {
+    "req_stat_cd": null,
+    "cust_type_cd": null
+  },
+  "fp_gifti_show_cmpr_file_info": {
+    "cpn_stat_cd": null
+  },
+  "pg_cmpr_info_m": {
+    "trtm_rslt_cd": null
+  },
+  "ph_cls_ag_hist": {
+    "rply_cd": null
+  },
+  "ph_mms_send_hist": {
+    "send_rslt_cd": null
+  },
+  "ph_mon_sttl_m": {
+    "trtm_rslt_cd": null
+  }
+}

@@ -13,6 +13,14 @@ class FKInfo:
 
 
 @dataclass
+class InferredFKInfo:
+    column: str       # 로컬 컬럼명
+    ref_table: str    # 참조 테이블명
+    ref_column: str   # 참조 컬럼명
+    source: str = ""  # "auto" (컬럼명 매칭) | "ai" (AI 추론)
+
+
+@dataclass
 class ColumnDef:
     no: int
     name: str               # COLUMN NAME
@@ -43,5 +51,8 @@ class TableDef:
     indexes: list[IndexDef] = field(default_factory=list)
     fk_list: list[FKInfo] = field(default_factory=list)  # Key List 섹션용
     comment_ai: bool = False       # True이면 AI가 추론한 comment
-    entity_class: str = ""         # 엔티티분류 (KEY / MAIN / ACTION)
-    entity_class_ai: bool = False  # True이면 AI가 추론한 entity_class
+    entity_class: str = ""              # 엔티티분류 (KEY / MAIN / ACTION)
+    entity_class_ai: bool = False       # True이면 AI가 추론한 entity_class
+    entity_definition: str = ""         # Entity 정의 (Row3 B:L 병합 셀)
+    entity_definition_ai: bool = False  # True이면 AI가 추론한 entity_definition
+    inferred_fk_list: list["InferredFKInfo"] = field(default_factory=list)  # FK 없는 컬럼 추론 관계

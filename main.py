@@ -6,8 +6,9 @@
 동작:
     1. ./input/*.sql 읽기
     2. pglast 파싱 → list[TableDef]
-    3. ./output/테이블정의서.xlsx 저장
-    4. 완료 메시지 출력 (테이블 수, 출력 경로)
+    3. AI 보완 (comment / attribute_name / entity_class / entity_definition / inferred_fk)
+    4. ./output/테이블정의서.xlsx 저장
+    5. 완료 메시지 출력 (테이블 수, 출력 경로)
 """
 from __future__ import annotations
 
@@ -15,7 +16,7 @@ import sys
 from pathlib import Path
 
 from pg_tabledef.parser import parse_files, filter_excluded
-from pg_tabledef.enricher import enrich, enrich_entity_class
+from pg_tabledef.enricher import enrich, enrich_entity_class, enrich_entity_definition, enrich_inferred_fk
 from pg_tabledef.writer.excel import ExcelWriter
 
 
@@ -46,6 +47,8 @@ def main() -> None:
     print(f"[INFO] AI 보완 중...")
     tables = enrich(tables)
     tables = enrich_entity_class(tables)
+    tables = enrich_entity_definition(tables)
+    tables = enrich_inferred_fk(tables)
 
     writer = ExcelWriter()
     writer.write(tables)

@@ -34,6 +34,7 @@
 pglast>=7.0
 openpyxl>=3.1
 pytest>=8.0
+anthropic>=0.25
 ```
 
 ### `pg_tabledef/models.py`
@@ -47,6 +48,13 @@ class FKInfo:
     constraint_name: str     # FK 제약조건명 (ALTER TABLE ... ADD CONSTRAINT {name}). 없으면 ""
 
 @dataclass
+class InferredFKInfo:
+    column: str       # 로컬 컬럼명
+    ref_table: str    # 참조 테이블명
+    ref_column: str   # 참조 컬럼명
+    source: str = ""  # "auto" (컬럼명 매칭) | "ai" (AI 추론)
+
+@dataclass
 class ColumnDef:
     no: int
     name: str                # COLUMN NAME
@@ -57,6 +65,7 @@ class ColumnDef:
     is_pk: bool
     is_uk: bool
     fk_info: Optional[FKInfo]
+    attribute_name_ai: bool = False
 
 @dataclass
 class IndexDef:
@@ -73,6 +82,12 @@ class TableDef:
     pk_constraint_name: str  # PK 제약조건명 (ALTER TABLE ... ADD CONSTRAINT {name}). 없으면 ""
     indexes: list[IndexDef]
     fk_list: list[FKInfo]    # Key List 섹션용
+    comment_ai: bool = False
+    entity_class: str = ""
+    entity_class_ai: bool = False
+    entity_definition: str = ""
+    entity_definition_ai: bool = False
+    inferred_fk_list: list[InferredFKInfo] = field(default_factory=list)
 ```
 
 ### `pg_tabledef/parser.py`
@@ -116,10 +131,11 @@ openpyxl 스타일 상수 정의:
 
 ```python
 # 폰트
-FONT_HEADER         = Font(bold=True, size=10)                          # 헤더 (일반 배경)
-FONT_HEADER_ON_DARK = Font(bold=True, size=10, color=Color(theme=1))    # 헤더 (어두운 배경 → 흰색)
+FONT_HEADER         = Font(bold=True, size=10)
+FONT_HEADER_ON_DARK = Font(bold=True, size=10, color=Color(theme=1))
 FONT_NORMAL         = Font(size=10)
 FONT_PK             = Font(bold=True, size=10)
+FONT_AI_SUGGESTED   = Font(size=10, color="CC5500")  # AI 추론값 (주황색)
 
 # 정렬
 ALIGN_CENTER       = Alignment(horizontal="center", vertical="center")
@@ -132,22 +148,19 @@ FILL_HEADER = PatternFill(fill_type="solid", fgColor=Color(theme=0, tint=-0.35))
 # 테두리 (thin 전체)
 BORDER_THIN = Border(...)
 
-# 컬럼 너비 (sample.xlsx 기준)
+# 컬럼 너비
 COL_WIDTHS = {
-    "A": 16.7,  # No.
-    "B": 28.0,  # COLUMN NAME
-    "C": 30.8,  # ATTRIBUTE NAME
-    "D": 14.7,  # Type
-    "E": 8.0,   # Length
-    "F": 6.8,   # Null
-    "G": 6.3,   # Keys
-    "H": 17.0,  # 인포타입명
-    "I": 21.7,  # Description
-    "J": 18.0,  # Attribute Type
-    "K": 25.0,  # Relation & Value
-    "L": 15.0,  # Source
+    "A": 16.7,  "B": 28.0,  "C": 30.8,  "D": 14.7,
+    "E": 8.0,   "F": 6.8,   "G": 6.3,   "H": 17.0,
+    "I": 21.7,  "J": 18.0,  "K": 25.0,  "L": 15.0,
+    "M": 60.0,  # COMMENT SQL (AI 추론 시 PostgreSQL COMMENT 스크립트)
 }
 ```
+
+### `rules/entity_definition_rules.json`
+
+테이블명(소문자) → Entity 정의 텍스트 매핑 파일.
+3개 섹션(집합적 의미/기능적 의미/자료발생 규칙) 형식. AI 추론값 자동 누적 저장.
 
 ### `rules/entity_class_rules.json`
 
@@ -230,14 +243,14 @@ writer.write(tables)
 ### `main.py`
 
 ```python
-# 사용법
-python main.py
-
-# 동작
-# 1. ./input/*.sql 읽기
-# 2. pglast 파싱 → list[TableDef]
-# 3. ./output/테이블정의서.xlsx 저장
-# 4. 완료 메시지 출력 (테이블 수, 출력 경로)
+tables = parse_files(input_dir)
+tables = filter_excluded(tables)    # rules/exclude_tables.txt 적용
+tables = enrich(tables)             # 빈 comment / attribute_name AI 보완
+tables = enrich_entity_class(tables)       # 엔티티분류 결정
+tables = enrich_entity_definition(tables)  # Entity 정의 결정
+tables = enrich_inferred_fk(tables)        # FK 관계 추론
+ExcelWriter().write(tables)
+MermaidWriter().write(tables)   # output/erd.md
 ```
 
 argparse 불필요. 입출력 경로 고정.
@@ -250,13 +263,17 @@ argparse 불필요. 입출력 경로 고정.
 
 | 파일 | 상태 | 비고 |
 |------|------|------|
-| requirements.txt | ✅ 완료 | pglast>=7.0, openpyxl>=3.1, pytest>=8.0 |
+| requirements.txt | ✅ 완료 | pglast, openpyxl, pytest, anthropic |
 | pg_tabledef/__init__.py | ✅ 완료 | |
-| pg_tabledef/models.py | ✅ 완료 | FKInfo, ColumnDef, IndexDef, TableDef |
-| pg_tabledef/parser.py | ✅ 완료 | pglast 파싱, 타입 약식 변환, CommentStmt 처리 |
+| pg_tabledef/models.py | ✅ 완료 | FKInfo, ColumnDef, IndexDef, TableDef + AI 플래그 필드 |
+| pg_tabledef/parser.py | ✅ 완료 | pglast 파싱, 타입 약식 변환, CommentStmt, filter_excluded |
+| pg_tabledef/enricher.py | ✅ 완료 | enrich / enrich_entity_class / enrich_entity_definition / enrich_inferred_fk |
 | pg_tabledef/writer/__init__.py | ✅ 완료 | |
-| pg_tabledef/writer/styles.py | ✅ 완료 | openpyxl 스타일 상수 |
-| pg_tabledef/writer/excel.py | ✅ 완료 | ExcelWriter (3섹션 레이아웃) |
-| main.py | ✅ 완료 | CLI 진입점, 107테이블 출력 확인 |
+| pg_tabledef/writer/styles.py | ✅ 완료 | openpyxl 스타일 상수 + FONT_AI_SUGGESTED |
+| pg_tabledef/writer/excel.py | ✅ 완료 | ExcelWriter (3섹션 레이아웃), _resolve_subject |
+| pg_tabledef/writer/mermaid.py | ❌ 제거 | ERD 출력 기능 제거 |
+| main.py | ✅ 완료 | CLI 진입점 |
+| rules/entity_definition_rules.json | ✅ 완료 | Entity 정의 수동 매핑 + AI 추론값 캐시 |
 | rules/entity_class_rules.json | ✅ 완료 | 엔티티분류 수동 매핑 + AI 추론값 캐시 |
+| rules/inferred_fk_rules.json | ✅ 완료 | FK 관계 추론 캐시 + _exclude 제외 설정 |
 | rules/table_subject_rules.json | ✅ 완료 | H/J/L열 주제영역 매핑 규칙 |

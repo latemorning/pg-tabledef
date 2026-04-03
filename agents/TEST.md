@@ -265,181 +265,37 @@ import openpyxl
 from pg_tabledef.writer.excel import ExcelWriter
 
 class TestSheetStructure:
-    def test_single_sheet_named_tabledef(self, sample_tables, tmp_path):
-        """시트 1개, 이름 = '테이블정의서'."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        wb = openpyxl.load_workbook(str(out))
-        assert wb.sheetnames == ["테이블정의서"]
-
-    def test_output_dir_auto_created(self, sample_tables, tmp_path):
-        """output 폴더 없어도 자동 생성."""
-        out = tmp_path / "new_dir" / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        assert out.exists()
+    def test_single_sheet_named_tabledef(self, sample_tables, tmp_path): ...
+    def test_output_dir_auto_created(self, sample_tables, tmp_path): ...
 
 class TestTableHeader:
-    def test_table_name_in_sheet(self, sample_tables, tmp_path):
-        """시트 어딘가에 테이블명이 존재."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        all_values = [ws.cell(r, c).value for r in range(1, ws.max_row+1) for c in range(1, 5)]
-        assert "orders" in all_values
-
-    def test_table_comment_in_sheet(self, sample_tables, tmp_path):
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        all_values = [ws.cell(r, c).value for r in range(1, ws.max_row+1) for c in range(1, 5)]
-        assert "주문정보" in all_values
-
-class TestKeyListAlignment:
-    def test_key_title_center_aligned(self, sample_tables, tmp_path):
-        """Primary Key / Foreign Key / Index Key / Sequence Key 타이틀(A열)은 가운데 정렬."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        key_titles = {"Primary Key", "Foreign Key", "Index Key", "Sequence Key"}
-        for r in range(1, ws.max_row + 1):
-            cell = ws.cell(r, 1)
-            if cell.value in key_titles:
-                assert cell.alignment.horizontal == "center", (
-                    f"Row {r} '{cell.value}' should be center-aligned"
-                )
-
-    def test_key_name_left_aligned(self, sample_tables, tmp_path):
-        """Key Name 값(B열)은 왼쪽 정렬."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Primary Key":
-                assert ws.cell(r, 2).alignment.horizontal == "left"
-                break
-
-    def test_column_name_left_aligned(self, sample_tables, tmp_path):
-        """Column Name 값(D열)은 왼쪽 정렬."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Primary Key":
-                assert ws.cell(r, 4).alignment.horizontal == "left"
-                break
-
-
-class TestKeyListContent:
-    def test_pk_constraint_name_in_key_name(self, sample_table_def, tmp_path):
-        """Primary Key 행 B열에 제약조건명(orders_pkey)이 표시됨."""
-        out = tmp_path / "out.xlsx"
-        from pg_tabledef.writer.excel import ExcelWriter
-        ExcelWriter(out).write([sample_table_def])
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Primary Key":
-                assert ws.cell(r, 2).value == "orders_pkey"
-                break
-
-    def test_pk_columns_in_column_name(self, sample_table_def, tmp_path):
-        """Primary Key 행 D열에 PK 컬럼명(order_id)이 표시됨."""
-        out = tmp_path / "out.xlsx"
-        from pg_tabledef.writer.excel import ExcelWriter
-        ExcelWriter(out).write([sample_table_def])
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Primary Key":
-                assert ws.cell(r, 4).value == "order_id"
-                break
-
-    def test_fk_constraint_name_in_key_name(self, sample_table_def, tmp_path):
-        """Foreign Key 행 B열에 FK 제약조건명(orders_cust_fk)이 표시됨."""
-        out = tmp_path / "out.xlsx"
-        from pg_tabledef.writer.excel import ExcelWriter
-        ExcelWriter(out).write([sample_table_def])
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Foreign Key":
-                assert ws.cell(r, 2).value == "orders_cust_fk"
-                break
-
-    def test_fk_column_ref_in_column_name(self, sample_table_def, tmp_path):
-        """Foreign Key 행 D열에 'cust_id → customers' 형식으로 표시됨."""
-        out = tmp_path / "out.xlsx"
-        from pg_tabledef.writer.excel import ExcelWriter
-        ExcelWriter(out).write([sample_table_def])
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Foreign Key":
-                val = ws.cell(r, 4).value or ""
-                assert "cust_id" in val and "customers" in val
-                break
-
-    def test_index_name_in_key_name(self, sample_table_def, tmp_path):
-        """Index Key 행 B열에 인덱스명(orders_cust_idx)이 표시됨."""
-        out = tmp_path / "out.xlsx"
-        from pg_tabledef.writer.excel import ExcelWriter
-        ExcelWriter(out).write([sample_table_def])
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Index Key":
-                assert ws.cell(r, 2).value == "orders_cust_idx"
-                break
-
-    def test_index_columns_in_column_name(self, sample_table_def, tmp_path):
-        """Index Key 행 D열에 인덱스 컬럼(cust_id)이 표시됨."""
-        out = tmp_path / "out.xlsx"
-        from pg_tabledef.writer.excel import ExcelWriter
-        ExcelWriter(out).write([sample_table_def])
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        for r in range(1, ws.max_row + 1):
-            if ws.cell(r, 1).value == "Index Key":
-                assert "cust_id" in (ws.cell(r, 4).value or "")
-                break
+    def test_table_name_in_sheet(self, sample_tables, tmp_path): ...
+    def test_table_comment_in_sheet(self, sample_tables, tmp_path): ...
 
 class TestColumnSection:
-    def test_pk_marker_present(self, sample_tables, tmp_path):
-        """PK 컬럼의 Keys 셀(G열)에 'PK' 값."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        all_values = {ws.cell(r, c).value for r in range(1, ws.max_row+1) for c in range(1, 13)}
-        assert "PK" in all_values
-
-    def test_fk_relation_value(self, sample_tables, tmp_path):
-        """FK 컬럼의 Relation & Value(K열)에 'customers' 포함."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        col_k_values = [ws.cell(r, 11).value for r in range(1, ws.max_row+1)]
-        assert any(v and "customers" in str(v) for v in col_k_values)
-
-    def test_type_abbreviation_in_cell(self, sample_tables, tmp_path):
-        """타입 셀(D열)에 약식 표기(VC, INT 등) 사용."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        col_d_values = {ws.cell(r, 4).value for r in range(1, ws.max_row+1)}
-        assert "VC" in col_d_values or "INT" in col_d_values
-
-    def test_not_null_shows_nn(self, sample_tables, tmp_path):
-        """NOT NULL 컬럼의 Null 셀(F열)에 'NN' 표시."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        col_f_values = {ws.cell(r, 6).value for r in range(1, ws.max_row+1)}
-        assert "NN" in col_f_values
+    def test_pk_marker_present(self, sample_tables, tmp_path): ...   # G열 'PK'
+    def test_fk_relation_value(self, sample_tables, tmp_path): ...   # K열 'customers'
+    def test_type_abbreviation_in_cell(self, sample_tables, tmp_path): ...  # D열 'VC'/'INT'
+    def test_not_null_shows_nn(self, sample_tables, tmp_path): ...   # F열 'NN'
 
 class TestTableSeparation:
-    def test_two_tables_both_present(self, sample_tables, tmp_path):
-        """테이블 2개의 이름이 모두 시트에 존재."""
-        out = tmp_path / "out.xlsx"
-        ExcelWriter(out).write(sample_tables)
-        ws = openpyxl.load_workbook(str(out))["테이블정의서"]
-        all_values = {ws.cell(r, c).value
-                      for r in range(1, ws.max_row+1) for c in range(1, 5)}
-        assert "customers" in all_values
-        assert "orders" in all_values
+    def test_two_tables_both_present(self, sample_tables, tmp_path): ...
+
+class TestSubjectRules:
+    """table_subject_rules.json 기반 H/J/L열 매핑 검증."""
+    def test_adm_prefix(self): ...
+    def test_ph_prefix(self): ...
+    def test_st_prefix(self): ...
+    def test_cmpr_contains(self): ...
+    def test_fp_prefix(self): ...
+    def test_ex_strip_then_adm(self): ...  # EX_ 제거 후 ADM_ 매칭
+    def test_ex_strip_then_ph(self): ...   # EX_ 제거 후 PH_ 매칭
+    def test_no_match_returns_empty(self): ...
+    def test_subject_values_in_excel_header(self): ...  # ADM_ 테이블 H/J/L열 검증
+
+class TestTableCompleteness:
+    def test_table_count_matches(self): ...    # Excel 출력 테이블 수 == 파싱된 테이블 수
+    def test_column_count_per_table(self): ... # 각 테이블 컬럼 행 수 == 파싱된 컬럼 수
 ```
 
 ---
@@ -481,7 +337,9 @@ pytest tests/test_writer.py -v
 |------|------|-----------|
 | tests/conftest.py | ✅ 완료 | - |
 | tests/fixtures/sample.sql | ✅ 완료 | - |
-| tests/test_parser.py | ✅ 완료 | 27/27 |
-| tests/test_writer.py | ✅ 완료 | 19/19 (TestSubjectRules 9개 추가) |
+| tests/test_parser.py | ✅ 완료 | 26/26 |
+| tests/test_writer.py | ✅ 완료 | 20/20 (전체 46개) |
+| pg_tabledef/writer/mermaid.py | ⬜ 미작성 | MermaidWriter 테스트 없음 |
+| pg_tabledef/enricher.py (inferred_fk) | ⬜ 미작성 | enrich_inferred_fk 테스트 없음 |
 
 **버그 수정**: `parser.py::_parse_constraint` — FK 로컬 컬럼을 `con.keys` 대신 `con.fk_attrs`에서 읽도록 수정 (pglast FK AST 구조 오류).

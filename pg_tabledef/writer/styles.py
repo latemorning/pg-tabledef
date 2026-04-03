@@ -53,5 +53,5 @@ COL_WIDTHS: dict[str, float] = {
 # 행 높이
 # ──────────────────────────────────────────────────────────────────────────────
 ROW_HEIGHT_DEFAULT    = 20.0
-ROW_HEIGHT_ENTITY_DEF = 120.0   # Entity 정의 행 (Row 3)
+ROW_HEIGHT_ENTITY_DEF = 160.0   # Entity 정의 행 (Row 3)
 ROW_HEIGHT_KEY_HEADER = 40.0    # Key List 헤더 행 (Row 4)
